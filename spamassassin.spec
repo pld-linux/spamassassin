@@ -9,11 +9,11 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
 Version:	2.60
-Release:	1
+Release:	2
 License:	GPL v1+ or Artistic
 Group:		Applications/Mail
-Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
-# Source0-md5:	5d23aa5ddb1c5381281cd88bf734341f
+Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.bz2
+# Source0-md5:	bd1607d8fa52ef3f5fdda5e05f971e9d
 Source1:	%{name}.sysconfig
 Patch0:		%{name}-rc-script.patch
 URL:		http://spamassassin.org/
@@ -143,12 +143,11 @@ aplikacji do czytania poczty.
 echo "postmaster@localhost" | \
 %{__perl} Makefile.PL \
 	INSTALLDIRS=vendor \
-	PREFIX=$RPM_BUILD_ROOT%{_prefix} \
-	SYSCONFDIR=$RPM_BUILD_ROOT%{_sysconfdir} \
-	INST_PREFIX=%{_prefix} \
-	INST_SYSCONFDIR=%{_sysconfdir} \
-	RUN_RAZOR1_TESTS=0 \
-	RUN_RAZOR2_TESTS=0
+	PREFIX=%{_prefix} \
+	SYSCONFDIR=%{_sysconfdir} \
+	ENABLE_SSL=yes \
+	RUN_RAZOR_TESTS=0 \
+	PERL_BIN=%{__perl}
 %{__make} \
 	OPTIMIZE="%{rpmcflags}"
 
@@ -159,12 +158,9 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spamassassin}
 
 %{__make} install \
-	INSTALLMAN1DIR=$RPM_BUILD_ROOT%{_mandir}/man1 \
-	INSTALLMAN3DIR=$RPM_BUILD_ROOT%{_mandir}/man3
+	DESTDIR=$RPM_BUILD_ROOT
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamassassin
-install rules/local.cf $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
-install rules/languages $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
 
 # shouldn't this script be called `spamd' instead?
 install spamd/pld-rc-script.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/spamassassin
