@@ -1,6 +1,7 @@
 #
 # Conditional build:
 # _with_tests - perform "make test"
+#
 %include	/usr/lib/rpm/macros.perl
 %define	pdir	Mail
 %define	pnam	SpamAssassin
@@ -8,7 +9,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
 Version:	2.43
-Release:	1
+Release:	2
 License:	Artistic
 Group:		Applications/Mail
 Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
@@ -149,9 +150,9 @@ install -d $RPM_BUILD_ROOT{%{sa_confdir},/etc/{sysconfig,rc.d/init.d}}
 
 %{__make} install \
 	PREFIX=$RPM_BUILD_ROOT%{_prefix} \
+	SYSCONFDIR=$RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin \
 	INSTALLMAN1DIR=$RPM_BUILD_ROOT%{_mandir}/man1 \
-	INSTALLMAN3DIR=$RPM_BUILD_ROOT%{_mandir}/man3 \
-	LOCAL_RULES_DIR=$RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
+	INSTALLMAN3DIR=$RPM_BUILD_ROOT%{_mandir}/man3
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamassassin
 
