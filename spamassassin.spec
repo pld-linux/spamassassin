@@ -16,6 +16,7 @@ Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.bz2
 # Source0-md5:	bd1607d8fa52ef3f5fdda5e05f971e9d
 Source1:	%{name}.sysconfig
 Patch0:		%{name}-rc-script.patch
+Patch1:		%{name}-make.patch
 URL:		http://spamassassin.org/
 BuildRequires:	openssl-devel >= 0.9.7c
 BuildRequires:	perl-devel >= 5.8
@@ -138,6 +139,7 @@ aplikacji do czytania poczty.
 %prep
 %setup -q -n %{pdir}-%{pnam}-%{version}
 %patch0 -p0
+%patch1 -p1
 
 %build
 echo "postmaster@localhost" | \
@@ -158,6 +160,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spamassassin}
 
 %{__make} install \
+	SYSCONFDIR=$RPM_BUILD_ROOT%{_sysconfdir} \
 	DESTDIR=$RPM_BUILD_ROOT
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamassassin
