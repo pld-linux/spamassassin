@@ -145,7 +145,6 @@ echo "postmaster@localhost" | \
 	INSTALLDIRS=vendor \
 	PREFIX=%{_prefix} \
 	SYSCONFDIR=%{_sysconfdir} \
-	INSTALLVENDORDATA="\$(DESTDIR)\$(VENDORPREFIX)/share/spamassassin" \
 	ENABLE_SSL=yes \
 	RUN_RAZOR_TESTS=0 \
 	PERL_BIN=%{__perl}
@@ -160,8 +159,6 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spam
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
-
-install rules/local.cf $RPM_BUILD_ROOT/etc/mail/spamassassin
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamassassin
 
