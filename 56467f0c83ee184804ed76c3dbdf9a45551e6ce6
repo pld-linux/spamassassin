@@ -1,0 +1,2 @@
+- removed noautoreq perl(Net::SMTP::*), added missing local.cf,
+  fixed Makefile.PL; release 5
