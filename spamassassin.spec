@@ -1,3 +1,5 @@
+# TODO:
+# - SECURITY: http://securitytracker.com/alerts/2004/Aug/1010903.html
 #
 # Conditional build:
 %bcond_with  tests	# perform "make test"
