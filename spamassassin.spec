@@ -175,7 +175,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %post spamd
 /sbin/chkconfig --add spamassassin
-if [ -f /var/lock/subsys/spamassassin ]; then
+if [ -f /var/lock/subsys/spamd ]; then
 	/etc/rc.d/init.d/spamassassin restart 1>&2
 else
 	echo 'Run "/etc/rc.d/init.d/spamassassin start" to start the spamd daemon.'
@@ -183,7 +183,7 @@ fi
 
 %preun spamd
 if [ "$1" = "0" ]; then
-	if [ -f /var/lock/subsys/spamassassin ]; then
+	if [ -f /var/lock/subsys/spamd ]; then
 		/etc/rc.d/init.d/spamassassin stop 1>&2
 	fi
 	/sbin/chkconfig --del spamassassin
