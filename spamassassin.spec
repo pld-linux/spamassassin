@@ -8,7 +8,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Group:		Applications/Mail
 Version:	2.41
-Release:	3
+Release:	4
 Name:		spamassassin
 License:	Artistic
 Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
@@ -155,7 +155,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -n perl-Mail-SpamAssassin
 %defattr(644,root,root,755)
-%doc sample-nonspam.txt sample-spam.txt
+%doc sample-nonspam.txt sample-spam.txt doc/*.html
 %dir %{_sysconfdir}/mail/spamassassin
 %config(noreplace) %{_sysconfdir}/mail/spamassassin/*
 %dir %{_datadir}/spamassassin
