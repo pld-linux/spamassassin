@@ -1,11 +1,12 @@
 %include	/usr/lib/rpm/macros.perl
 %define	pdir	Mail
 %define	pnam	SpamAssassin
-Summary:	%{pdir}::%{pnam} -- Perl modules for SpamAssassin
+Summary:	%{pdir}::%{pnam} -- SpamAssassin e-mail filter Perl modules.
+Summary(pl):	%{pdir}::%{pnam} -- modu³y Perla filtru poczty SpamAssassin.
 Name:		perl-%{pdir}-%{pnam}
 Version:	2.31
-Release:	1
-License:	Artistic
+Release:	2
+License:	GPL/Artistic
 Group:		Development/Languages/Perl
 URL:		http://spamassassin.org/
 Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
@@ -36,12 +37,14 @@ stworzon± wcze¶niej baz± regu³. Po zidentyfikowaniu, poczta mo¿e byæ
 oznaczona jako spam w celu pó¼niejszego wyfiltrowania, np. przy u¿yciu
 aplikacji do czytania poczty.
 
-%package -n SpamAssassin
+%package -n spamassassin
 Summary:	A spam filter for email which can be invoked from mail delivery agents.
+Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA).
 Group:		Applications/Mail
-#Prereq:		/sbin/chkconfig
+Obsoletes:	SpamAssassin
+Prereq:		/sbin/chkconfig
 
-%description -n SpamAssassin
+%description -n spamassassin
 SpamAssassin provides you with a way to reduce if not completely
 eliminate Unsolicited Commercial Email (SPAM) from your incoming
 email. It can be invoked by a MDA such as sendmail or postfix, or can
@@ -52,7 +55,7 @@ by the user's mail reading software. This distribution includes the
 spamd/spamc components which create a server that considerably speeds
 processing of mail.
 
-%description -n SpamAssassin -l pl
+%description -n spamassassin -l pl
 SpamAssassin udostêpnia Ci mo¿liwo¶æ zredukowania, je¶li nie
 kompletnego wyeliminowania Niezamawianej Komercyjnej Poczty
 (Unsolicited Commercial Email, spamu) z Twojej poczty. Mo¿e byæ
@@ -64,17 +67,18 @@ Ta dystrybucja zawiera programy spamd/spamc, umo¿liwiaj±ce
 uruchomienie serwera, co znacznie przyspieszy proces przetwarzania
 poczty.
 
-%package -n SpamAssassin-tools
+%package -n spamassassin-tools
 Summary:	Miscleanous tools for SpamAssassin.
 Summary(pl):	Przeró¿ne narzêdzia zwi±zane z SpamAssassin.
 Group:		Applications/Mail
+Obsoletes:	SpamAssassin-tools
 #BuildArch:	noarch
 
-%description -n SpamAssassin-tools
+%description -n spamassassin-tools
 Miscleanous tools from various authors, distributed with SpamAssassin.
 See /usr/share/doc/SpamAssassin-tools-*/.
 
-%description -n SpamAssassin-tools -l pl
+%description -n spamassassin-tools -l pl
 Przeró¿ne narzêdzia, dystrybuowane razem z SpamAssassin. Zobacz
 /usr/share/doc/SpamAssassin-tools-*/.
 
@@ -94,10 +98,33 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} install DESTDIR=$RPM_BUILD_ROOT
 
 install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
+# shouldn't this script be called `spamd' instead?
 install -m 0755 spamd/pld-rc-script.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/spamassassin
 
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
 
+rm -f spamd/{*.sh,*.conf,spam*} spamproxy/spamproxyd*
+
+%post -n spamassassin
+if [ $1 = 1 ]; then
+	/sbin/chkconfig --add spamassassin
+fi
+if [ -f /var/lock/subsys/spamassassin ]; then
+	/etc/rc.d/init.d/spamassassin restart 1>&2
+else
+	echo 'Run "/etc/rc.d/init.d/spamassassin start" to start the spamd daemon.'
+fi
+
+%preun -n spamassassin
+if [ $1 = 0 ]; then
+	if [ -f /var/lock/subsys/spamassassin ]; then
+		/etc/rc.d/init.d/spamassassin stop 1>&2
+	fi
+	/sbin/chkconfig --del spamassassin
+fi
+
+%clean
+rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
@@ -107,7 +134,7 @@ install -d $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
 %doc
 %{_mandir}/man3/*
 
-%files -n SpamAssassin
+%files -n spamassassin
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/*
 
@@ -115,13 +142,9 @@ install -d $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
 %config(noreplace) %{_sysconfdir}/mail/spamassassin
 %config(noreplace) %{_datadir}/spamassassin
 
-%doc Changes README TODO sample-nonspam.txt sample-spam.txt
-%doc spamd/README.spamd* spamproxy/[RC]*
+%doc Changes README TODO sample-nonspam.txt sample-spam.txt spamd spamproxy
 %{_mandir}/man1/*
 
-%files -n SpamAssassin-tools
+%files -n spamassassin-tools
 %defattr(644,root,root,755)
 %doc sql tools masses contrib
-
-%clean
-rm -rf $RPM_BUILD_ROOT
