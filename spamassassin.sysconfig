@@ -1,4 +1,4 @@
-# Customized setings for spamassassin (spamd)
+# Customized settings for spamassassin (spamd)
 
 # Cmdline options 
 SPAMD_OPTS="-d -c"
