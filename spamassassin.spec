@@ -1,6 +1,7 @@
 #
 # Conditional build:
-%bcond_with  tests	# perform "make test"
+%bcond_with	tests		# perform "make test"
+%bcond_without  prefork		# don't apply prefork patch inspired by apache
 #
 %include	/usr/lib/rpm/macros.perl
 %define		pdir	Mail
@@ -9,7 +10,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
 Version:	3.0.1
-Release:	3
+Release:	4
 License:	Apache Software License v2
 Group:		Applications/Mail
 Source0:	http://www.apache.org/dist/spamassassin/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -140,7 +141,7 @@ aplikacji do czytania poczty.
 
 %prep
 %setup -q -n %{pdir}-%{pnam}-%{version}
-%patch0 -p0
+%{?with_prefork:%patch0 -p0}
 
 %build
 echo "postmaster@localhost" | \
