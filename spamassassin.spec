@@ -4,21 +4,21 @@
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Group:		Applications/Mail
-Version:	2.31
-Release:	5
+Version:	2.40
+Release:	1
 Name:		spamassassin
-License:	GPL/Artistic
+License:	Artistic
 Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
-Patch0:		spamassassin-makefile.patch
-Patch1:		spamassassin-rc-script.patch
+Patch0:		spamassassin-rc-script.patch
 URL:		http://spamassassin.org/
 BuildRequires:	perl >= 5.6
 BuildRequires:	rpm-perlprov >= 3.0.3-16
 Prereq:		/sbin/chkconfig
+Requires:	perl-Mail-SpamAssassin >= %{version}
 Obsoletes:	SpamAssassin
 Buildroot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_noautoreq	'perl(Razor::Agent)' 'perl(Razor::Client)'
+%define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)'
 
 %description
 SpamAssassin provides you with a way to reduce if not completely
@@ -51,17 +51,17 @@ Obsoletes:	SpamAssassin-tools
 
 %description tools
 Miscleanous tools from various authors, distributed with SpamAssassin.
-See /usr/share/doc/SpamAssassin-tools-*/.
+See /usr/share/doc/spamassassin-tools-*/.
 
 %description tools -l pl
 Przeró¿ne narzêdzia, dystrybuowane razem z SpamAssassin. Zobacz
-/usr/share/doc/SpamAssassin-tools-*/.
-
+/usr/share/doc/spamassassin-tools-*/.
 
 %package -n perl-Mail-SpamAssassin
 Summary:	%{pdir}::%{pnam} -- SpamAssassin e-mail filter Perl modules
 Summary(pl):	%{pdir}::%{pnam} -- modu³y Perla filtru poczty SpamAssassin
 Group:		Development/Languages/Perl
+
 
 %description -n perl-Mail-SpamAssassin
 Mail::SpamAssassin is a Mail::Audit plugin to identify spam using text
@@ -80,27 +80,33 @@ stworzon± wcze¶niej baz± regu³. Po zidentyfikowaniu, poczta mo¿e byæ
 oznaczona jako spam w celu pó¼niejszego wyfiltrowania, np. przy u¿yciu
 aplikacji do czytania poczty.
 
+%define		sa_confdir	$RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
 
 %prep -q
 %setup -q -n %{pdir}-%{pnam}-%{version}
 %patch0 -p0
-%patch1 -p1
 
 %build
-%{__perl} Makefile.PL PREFIX=%{_prefix}
+%{__perl} Makefile.PL PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir}
 %{__make} OPTIMIZE="%{rpmcflags}" PREFIX=%{_prefix}
 #%make test
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_sysconfdir}/mail/spamassassin,/etc/rc.d/init.d}
+install -d $RPM_BUILD_ROOT{%{sa_confdir},/etc/rc.d/init.d}
 
-%{__make} install DESTDIR=$RPM_BUILD_ROOT
+%{__make} install \
+	PREFIX=$RPM_BUILD_ROOT%{_prefix} \
+	INSTALLMAN1DIR=$RPM_BUILD_ROOT%{_prefix}/share/man/man1 \
+	INSTALLMAN3DIR=$RPM_BUILD_ROOT%{_prefix}/share/man/man3 \
+	LOCAL_RULES_DIR=$RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
+
+install rules/local.cf $RPM_BUILD_ROOT%{sa_confdir}
 
 # shouldn't this script be called `spamd' instead?
 install spamd/pld-rc-script.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/spamassassin
 
-rm -f spamd/{*.sh,*.conf,spam*} spamproxy/spamproxyd*
+rm -f spamd/{*.sh,*.conf,spam*} contrib/snp.tar.gz
 
 %post
 if [ $1 = 1 ]; then
@@ -125,11 +131,14 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc Changes README TODO sample-nonspam.txt sample-spam.txt spamd spamproxy
+%doc BUGS Changes COPYRIGHT INSTALL README TODO TRADEMARK
+%doc sample-nonspam.txt sample-spam.txt spamd procmailrc.example
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_sysconfdir}/rc.d/init.d/spamassassin
-%config(noreplace) %{_sysconfdir}/mail/spamassassin
-%config(noreplace) %{_datadir}/spamassassin
+%dir %{_sysconfdir}/mail/spamassassin
+%config(noreplace) %{_sysconfdir}/mail/spamassassin/*
+%dir %{_datadir}/spamassassin
+%config(noreplace) %{_datadir}/spamassassin/*
 %{_mandir}/man1/*
 
 %files tools
@@ -139,5 +148,4 @@ rm -rf $RPM_BUILD_ROOT
 %files -n perl-Mail-SpamAssassin
 %defattr(644,root,root,755)
 %{perl_sitelib}/Mail/*
-%{perl_sitelib}/auto/Mail/*
 %{_mandir}/man3/*
