@@ -1,5 +1,5 @@
---- Makefile.PL	Sat Jul 20 15:38:25 2002
-+++ Makefile.PL.new	Sat Jul 20 15:39:53 2002
+--- Makefile.PL.old	Sun Aug  4 10:17:00 2002
++++ Makefile.PL	Sun Aug  4 10:18:10 2002
 @@ -1,6 +1,6 @@
  require 5.005;
  
@@ -8,6 +8,15 @@
  
  my $LOCAL_RULES_DIR	= '/etc/mail/spamassassin';
  
+@@ -13,7 +13,7 @@
+ 
+ # do this in perl, it's more portable
+ my $rulesfiles = join (' ', map { s/rules.//; $_ } (<rules/*.cf>));
+-$rulesfiles =~ s/local\.cf//;
++#$rulesfiles =~ s/local\.cf//;
+ $rulesfiles =~ s/regression_tests\.cf//; # Don't include regression tests
+ 
+ $rulesfiles .= " triplets.txt languages";
 @@ -83,7 +83,7 @@
      # do this with MakeMaker without it trying to build the perl
      # modules as .so's :(
@@ -26,6 +35,15 @@
  
  pm_to_blib: spamassassin doc/.made
  
+@@ -135,7 +135,7 @@
+ 	mkdir -p $(DEF_RULES_DIR)
+ 
+ $(LOCAL_RULES_DIR):
+-	mkdir -p $(LOCAL_RULES_DIR)
++	mkdir -p $(DESTDIR)$(LOCAL_RULES_DIR)
+ 
+ doc:
+ 	mkdir -p doc
 @@ -153,5 +153,5 @@
  	touch doc/.made
  	-rm -f pod2htm*
