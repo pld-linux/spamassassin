@@ -27,7 +27,6 @@ BuildRequires:	perl-MailTools
 BuildRequires:	perl-MIME-Base64
 BuildRequires:	perl-MIME-tools
 %endif
-Prereq:		/sbin/chkconfig
 Requires:	perl-Mail-SpamAssassin >= %{version}
 Buildroot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	SpamAssassin
@@ -75,6 +74,8 @@ Przeró¿ne narzêdzia, dystrybuowane razem z SpamAssassin. Zobacz
 Summary:	spamd - daemonized version of spamassassin
 Summary(pl):	spamd - spamassassin w postaci demona
 Group:		Applications/Mail
+PreReq:		rc-scripts
+Requires(post,preun):	/sbin/chkconfig
 
 %description spamd
 The purpose of this program is to provide a daemonized version of the
@@ -168,6 +169,9 @@ install spamd/pld-rc-script.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/spamassassin
 
 rm -f spamd/{*.sh,*.conf,spam*} contrib/snp.tar.gz
 
+%clean
+rm -rf $RPM_BUILD_ROOT
+
 %post spamd
 /sbin/chkconfig --add spamassassin
 if [ -f /var/lock/subsys/spamassassin ]; then
@@ -183,9 +187,6 @@ if [ "$1" = "0" ]; then
 	fi
 	/sbin/chkconfig --del spamassassin
 fi
-
-%clean
-rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
