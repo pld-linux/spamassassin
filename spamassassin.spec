@@ -10,12 +10,12 @@
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
-Version:	2.63
-Release:	1
+Version:	2.64
+Release:	0.1
 License:	GPL v1+ or Artistic
 Group:		Applications/Mail
-Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
-# Source0-md5:	fc5a8e69ef2355c30c7b71877ac58d57
+Source0:	http://old.spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
+# Source0-md5:	a82a9dab95462d102e253edb99091fdd
 Source1:	%{name}.sysconfig
 Patch0:		%{name}-rc-script.patch
 URL:		http://spamassassin.org/
@@ -30,7 +30,8 @@ BuildRequires:	perl-MIME-Base64
 BuildRequires:	perl-MIME-tools
 %endif
 BuildRequires:	rpm-perlprov >= 4.0.2-104
-Prereq:		/sbin/chkconfig
+PreReq:		rc-scripts
+Requires(post,preun):	/sbin/chkconfig
 Requires:	perl-Mail-SpamAssassin >= %{version}
 Obsoletes:	SpamAssassin
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -116,7 +117,7 @@ dziêki czemu powinien dzia³aæ szybciej ni¿ sam spamassassin.
 
 %package -n perl-Mail-SpamAssassin
 Summary:	Mail::SpamAssassin - SpamAssassin e-mail filter libraries
-Summary(pl):	Mail::SpamAssassin - biblioteki filtru poczty SpamAssassin
+Summary(pl):	Mail::SpamAssassin - biblioteki filtra poczty SpamAssassin
 Group:		Development/Languages/Perl
 Requires:	perl-HTML-Parser >= 3
 
@@ -172,7 +173,7 @@ rm -f spamd/{*.sh,*.conf,spam*} contrib/snp.tar.gz
 
 %post spamd
 /sbin/chkconfig --add spamassassin
-if [ -f /var/lock/subsys/spamassassin ]; then
+if [ -f /var/lock/subsys/spamd ]; then
 	/etc/rc.d/init.d/spamassassin restart 1>&2
 else
 	echo 'Run "/etc/rc.d/init.d/spamassassin start" to start the spamd daemon.'
@@ -180,7 +181,7 @@ fi
 
 %preun spamd
 if [ "$1" = "0" ]; then
-	if [ -f /var/lock/subsys/spamassassin ]; then
+	if [ -f /var/lock/subsys/spamd ]; then
 		/etc/rc.d/init.d/spamassassin stop 1>&2
 	fi
 	/sbin/chkconfig --del spamassassin
