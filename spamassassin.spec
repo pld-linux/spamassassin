@@ -135,7 +135,7 @@ stworzon± wcze¶niej baz± regu³. Po zidentyfikowaniu, poczta mo¿e byæ
 oznaczona jako spam w celu pó¼niejszego wyfiltrowania, np. przy u¿yciu
 aplikacji do czytania poczty.
 
-%prep -q
+%prep
 %setup -q -n %{pdir}-%{pnam}-%{version}
 %patch0 -p0
 
