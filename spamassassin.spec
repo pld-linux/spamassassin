@@ -116,7 +116,7 @@ dziêki czemu powinien dzia³aæ szybciej ni¿ sam spamassassin.
 
 %package -n perl-Mail-SpamAssassin
 Summary:	Mail::SpamAssassin - SpamAssassin e-mail filter libraries
-Summary(pl):	Mail::SpamAssassin - biblioteki filtru poczty SpamAssassin
+Summary(pl):	Mail::SpamAssassin - biblioteki filtra poczty SpamAssassin
 Group:		Development/Languages/Perl
 Requires:	perl-HTML-Parser >= 3
 Requires:	perl-Cache-DB_File >= 0.2
