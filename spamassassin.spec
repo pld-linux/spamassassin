@@ -8,7 +8,7 @@
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
-Version:	2.51
+Version:	2.52
 Release:	1
 License:	GPL v1+ or Artistic
 Group:		Applications/Mail
