@@ -17,9 +17,8 @@ Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
 Source1:	%{name}.sysconfig
 Patch0:		%{name}-rc-script.patch
 URL:		http://spamassassin.org/
-BuildRequires:	perl-devel >= 5.6
-BuildRequires:	rpm-perlprov >= 4.0.2-104
 BuildRequires:	openssl-devel >= 0.9.6j
+BuildRequires:	perl-devel >= 5.6
 %if %{?_with_tests:1}0
 BuildRequires:	perl-HTML-Parser >= 3
 # are these really needed?
@@ -28,6 +27,7 @@ BuildRequires:	perl-Mail-Audit
 BuildRequires:	perl-MIME-Base64
 BuildRequires:	perl-MIME-tools
 %endif
+BuildRequires:	rpm-perlprov >= 4.0.2-104
 Prereq:		/sbin/chkconfig
 Requires:	perl-Mail-SpamAssassin >= %{version}
 Buildroot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
