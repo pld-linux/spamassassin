@@ -8,12 +8,12 @@
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
-Version:	2.55
+Version:	2.60
 Release:	1
 License:	GPL v1+ or Artistic
 Group:		Applications/Mail
 Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
-# Source0-md5:	f4d7898301851c83ad157c0a59b98833
+# Source0-md5:	5d23aa5ddb1c5381281cd88bf734341f
 Source1:	%{name}.sysconfig
 Patch0:		%{name}-rc-script.patch
 URL:		http://spamassassin.org/
@@ -140,6 +140,7 @@ aplikacji do czytania poczty.
 %patch0 -p0
 
 %build
+echo "postmaster@localhost" | \
 %{__perl} Makefile.PL \
 	INSTALLDIRS=vendor \
 	PREFIX=$RPM_BUILD_ROOT%{_prefix} \
