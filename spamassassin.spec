@@ -17,7 +17,7 @@ Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
 Source1:	%{name}.sysconfig
 Patch0:		%{name}-rc-script.patch
 URL:		http://spamassassin.org/
-BuildRequires:	openssl-devel >= 0.9.6k
+BuildRequires:	openssl-devel >= 0.9.6m
 BuildRequires:	perl-devel >= 5.6
 %if %{with tests}
 BuildRequires:	perl-HTML-Parser >= 3
