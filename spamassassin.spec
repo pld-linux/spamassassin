@@ -9,7 +9,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
 Version:	2.53
-Release:	1
+Release:	2
 License:	GPL v1+ or Artistic
 Group:		Applications/Mail
 Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
@@ -23,6 +23,7 @@ BuildRequires:	openssl-devel >= 0.9.6j
 BuildRequires:	perl-HTML-Parser >= 3
 # are these really needed?
 BuildRequires:	perl-MailTools
+BuildRequires:	perl-Mail-Audit
 BuildRequires:	perl-MIME-Base64
 BuildRequires:	perl-MIME-tools
 %endif
