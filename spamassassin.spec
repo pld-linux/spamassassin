@@ -19,6 +19,7 @@ Patch0:		%{name}-rc-script.patch
 URL:		http://spamassassin.org/
 BuildRequires:	openssl-devel >= 0.9.7c
 BuildRequires:	perl-devel >= 5.8
+BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
 %if %{?_with_tests:1}0
 BuildRequires:	perl-HTML-Parser >= 3
 # are these really needed?
