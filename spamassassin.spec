@@ -8,7 +8,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
 Version:	2.41
-Release:	6
+Release:	7
 License:	Artistic
 Group:		Applications/Mail
 Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
@@ -81,8 +81,12 @@ for automated mail checking.
 This is intended to be used alongside "spamc", a fast, low-overhead C
 client program.
 
-# %description spamd -l pl
-# TODO
+%description spamd -l pl
+Spamd jest "demoniczn±" wersj± spamassassina. Jego zadaniem jest
+poprawa wydajno¶ci automatycznego sprawdzania poczty.
+
+Spamd powinien byæ u¿ywany wespó³ ze "spamc", który jest szybkim i
+wydajnym programem klienckim.
 
 %package spamc
 Summary:	spamc - client for spamd
@@ -97,8 +101,12 @@ the result back and print it to STDOUT. Spamc has extremely low
 overhead in loading, so it should be much faster to load than the
 whole spamassassin program.
 
-# %description spamc -l pl
-# TODO
+%description spamc -l pl
+Spamc powinien byæ u¿ywany zamiast "spamassassina" w skryptach
+przetwarzaj±cych pocztê. Zczytuje pocztê ze STDIN, kolejkuje j± a
+nastêpnie przekazuje spamd'owi, odczytuje wynik i podaje go na STDOUT.
+Spamc stara siê nie obci±¿aæ zbytnio procesora podczas ³adowania,
+dziêki czemu powinien dzia³aæ szybciej ni¿ sam spamassassin.
 
 %package -n perl-Mail-SpamAssassin
 Summary:	%{pdir}::%{pnam} -- SpamAssassin e-mail filter Perl modules
