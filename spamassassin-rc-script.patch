@@ -1,6 +1,6 @@
-diff -urN Mail-SpamAssassin-2.31.old/spamd/pld-rc-script.sh Mail-SpamAssassin-2.31/spamd/pld-rc-script.sh
---- Mail-SpamAssassin-2.31.old/spamd/pld-rc-script.sh	Thu Jan  1 01:00:00 1970
-+++ Mail-SpamAssassin-2.31/spamd/pld-rc-script.sh	Sat Jul 20 14:17:33 2002
+diff -urN Mail-SpamAssassin-2.31/spamd/pld-rc-script.sh Mail-SpamAssassin-2.31.new/spamd/pld-rc-script.sh
+--- Mail-SpamAssassin-2.31/spamd/pld-rc-script.sh	Thu Jan  1 01:00:00 1970
++++ Mail-SpamAssassin-2.31.new/spamd/pld-rc-script.sh	Sat Jul 27 00:31:26 2002
 @@ -0,0 +1,66 @@
 +#!/bin/sh
 +#
@@ -8,11 +8,11 @@ diff -urN Mail-SpamAssassin-2.31.old/spamd/pld-rc-script.sh Mail-SpamAssassin-2.
 +#
 +# chkconfig: 2345 80 30
 +#
-+# description: spamd is a daemon process which uses SpamAssassin to check
-+#              email messages for SPAM.  It is normally called by spamc
-+#	           from a MDA.
-+# processname:	spamassassin
-+# pidfile:	/var/run/spamassassin.pid
++# description: spamd is a daemon process which uses SpamAssassin to check \
++#              email messages for SPAM.  It is normally called by spamc \
++#              from a MDA.
++# processname: spamassassin
++# pidfile:     /var/run/spamassassin.pid
 +
 +# Source function library.
 +. /etc/rc.d/init.d/functions
@@ -47,12 +47,12 @@ diff -urN Mail-SpamAssassin-2.31.old/spamd/pld-rc-script.sh Mail-SpamAssassin-2.
 +  stop)
 +	# Stop daemons.
 +	if [ -f /var/lock/subsys/spamd ]; then
-+		echo -n "Shutting down spamd: "
++		msg_stopping SpamAssassin
 +		killproc spamd
 +		RETVAL=$?
 +		rm -f /var/lock/subsys/spamd
 +	else
-+		msg_Already_Running SpamAssassin
++		msg_Not_Running SpamAssassin
 +	fi
 +	;;
 +  restart)
