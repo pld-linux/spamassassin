@@ -10,7 +10,7 @@ Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych poczt
 Name:		spamassassin
 Version:	2.50
 Release:	1
-License:	Artistic
+License:	GPL v1+ or Artistic
 Group:		Applications/Mail
 Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
 Source1:	%{name}.sysconfig
@@ -18,6 +18,7 @@ Patch0:		%{name}-rc-script.patch
 URL:		http://spamassassin.org/
 BuildRequires:	perl >= 5.6
 BuildRequires:	rpm-perlprov >= 3.0.3-16
+BuildRequires:	openssl-devel
 %if %{?_with_tests:1}%{!?_with_tests:0}
 BuildRequires:	perl-HTML-Parser >= 3
 # are these really needed?
@@ -184,9 +185,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc BUGS Changes COPYRIGHT INSTALL README TRADEMARK
+%doc BUGS Changes COPYRIGHT INSTALL README TRADEMARK USAGE
 %doc procmailrc.example
+%attr(755,root,root) %{_bindir}/sa-learn
 %attr(755,root,root) %{_bindir}/spamassassin
+%{_mandir}/man1/sa-learn*
 %{_mandir}/man1/spamassassin*
 
 %files tools
