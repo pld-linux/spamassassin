@@ -29,8 +29,8 @@ BuildRequires:	perl-MIME-tools
 %endif
 BuildRequires:	rpm-perlprov >= 4.1-13
 Requires:	perl-Mail-SpamAssassin >= %{version}
-Buildroot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	SpamAssassin
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(DBI)'
 
