@@ -1,6 +1,6 @@
 #
 # Conditional build:
-# _without_tests - do not perform "make test"
+# _with_tests - perform "make test"
 %include	/usr/lib/rpm/macros.perl
 %define	pdir	Mail
 %define	pnam	SpamAssassin
@@ -8,7 +8,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Group:		Applications/Mail
 Version:	2.41
-Release:	4
+Release:	5
 Name:		spamassassin
 License:	Artistic
 Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
@@ -16,7 +16,7 @@ Patch0:		spamassassin-rc-script.patch
 URL:		http://spamassassin.org/
 BuildRequires:	perl >= 5.6
 BuildRequires:	rpm-perlprov >= 3.0.3-16
-%if %{?_without_tests:0}%{!?_without_tests:1}
+%if %{?_with_tests:1}%{!?_with_tests:0}
 BuildRequires:	perl-HTML-Parser >= 3
 # are these really needed?
 BuildRequires:	perl-MailTools
@@ -67,12 +67,42 @@ See /usr/share/doc/spamassassin-tools-*/.
 Przeró¿ne narzêdzia, dystrybuowane razem z SpamAssassin. Zobacz
 /usr/share/doc/spamassassin-tools-*/.
 
+%package spamd
+Summary:	spamd - daemonized version of spamassassin
+Summary(pl):	spamd - spamassassin w postaci demona
+Group:		Applications/Mail
+
+%description spamd
+The purpose of this program is to provide a daemonized version of the
+spamassassin executable.  The goal is improving throughput performance
+for automated mail checking.
+
+This is intended to be used alongside "spamc", a fast, low-overhead C
+client program.
+
+# %description spamd -l pl
+# TODO
+
+%package spamc
+Summary:	spamc - client for spamd
+Summary(pl):	spamc - klient dla spamd
+Group:		Applications/Mail
+
+%description spamc
+Spamc is the client half of the spamc/spamd pair.  It should be used in
+place of "spamassassin" in scripts to process mail.  It will read the mail
+from STDIN, and spool it to its connection to spamd, then read the result
+back and print it to STDOUT.  Spamc has extremely low overhead in loading,
+so it should be much faster to load than the whole spamassassin program.
+
+# %description spamc -l pl
+# TODO
+
 %package -n perl-Mail-SpamAssassin
 Summary:	%{pdir}::%{pnam} -- SpamAssassin e-mail filter Perl modules
 Summary(pl):	%{pdir}::%{pnam} -- modu³y Perla filtru poczty SpamAssassin
 Group:		Development/Languages/Perl
 Requires:	perl-HTML-Parser >= 3
-
 
 %description -n perl-Mail-SpamAssassin
 Mail::SpamAssassin is a Mail::Audit plugin to identify spam using text
@@ -99,9 +129,9 @@ aplikacji do czytania poczty.
 
 %build
 %{__perl} Makefile.PL PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir}
-%{__make} OPTIMIZE="%{rpmcflags}" PREFIX=%{_prefix}
+%{__make} OPTIMIZE="%{rpmcflags}"
 
-%{!?_without_tests:%{__make} test}
+%{?_with_tests:%{__make} test}
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -120,7 +150,7 @@ install spamd/pld-rc-script.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/spamassassin
 
 rm -f spamd/{*.sh,*.conf,spam*} contrib/snp.tar.gz
 
-%post
+%post spamd
 if [ $1 = 1 ]; then
 	/sbin/chkconfig --add spamassassin
 fi
@@ -130,7 +160,7 @@ else
 	echo 'Run "/etc/rc.d/init.d/spamassassin start" to start the spamd daemon.'
 fi
 
-%preun
+%preun spamd
 if [ $1 = 0 ]; then
 	if [ -f /var/lock/subsys/spamassassin ]; then
 		/etc/rc.d/init.d/spamassassin stop 1>&2
@@ -144,18 +174,29 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc BUGS Changes COPYRIGHT INSTALL README TRADEMARK
-%doc spamd procmailrc.example
-%attr(755,root,root) %{_bindir}/*
-%attr(755,root,root) %{_sysconfdir}/rc.d/init.d/spamassassin
-%{_mandir}/man1/*
+%doc procmailrc.example
+%attr(755,root,root) %{_bindir}/spamassassin
+%{_mandir}/man1/spamassassin*
 
 %files tools
 %defattr(644,root,root,755)
 %doc sql tools masses contrib
 
+%files spamd
+%defattr(644,root,root,755)
+%doc spamd/*
+%attr(755,root,root) %{_sysconfdir}/rc.d/init.d/spamassassin
+%attr(755,root,root) %{_bindir}/spamd
+%{_mandir}/man1/spamd*
+
+%files spamc
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/spamc
+%{_mandir}/man1/spamc*
+
 %files -n perl-Mail-SpamAssassin
 %defattr(644,root,root,755)
-%doc sample-nonspam.txt sample-spam.txt doc/*.html
+%doc sample-nonspam.txt sample-spam.txt
 %dir %{_sysconfdir}/mail/spamassassin
 %config(noreplace) %{_sysconfdir}/mail/spamassassin/*
 %dir %{_datadir}/spamassassin
