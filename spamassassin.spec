@@ -5,7 +5,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Group:		Applications/Mail
 Version:	2.31
-Release:	4
+Release:	5
 Name:		spamassassin
 License:	GPL/Artistic
 Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
@@ -18,7 +18,7 @@ Prereq:		/sbin/chkconfig
 Obsoletes:	SpamAssassin
 Buildroot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_noautoreq	'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(Net::SMTP::Server)' 'perl(Net::SMTP::Client)'
+%define		_noautoreq	'perl(Razor::Agent)' 'perl(Razor::Client)'
 
 %description
 SpamAssassin provides you with a way to reduce if not completely
