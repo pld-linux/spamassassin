@@ -144,8 +144,10 @@ aplikacji do czytania poczty.
 	SYSCONFDIR=$RPM_BUILD_ROOT%{_sysconfdir} \
 	INST_PREFIX=%{_prefix} \
 	INST_SYSCONFDIR=%{_sysconfdir} \
-< /dev/null
-%{__make} OPTIMIZE="%{rpmcflags}"
+	RUN_RAZOR1_TESTS=0 \
+	RUN_RAZOR2_TESTS=0
+%{__make} \
+	OPTIMIZE="%{rpmcflags}"
 
 %{?_with_tests:%{__make} test}
 
