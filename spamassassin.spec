@@ -7,7 +7,7 @@
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
-Version:	2.42
+Version:	2.43
 Release:	1
 License:	Artistic
 Group:		Applications/Mail
@@ -131,7 +131,7 @@ stworzon± wcze¶niej baz± regu³. Po zidentyfikowaniu, poczta mo¿e byæ
 oznaczona jako spam w celu pó¼niejszego wyfiltrowania, np. przy u¿yciu
 aplikacji do czytania poczty.
 
-%define		sa_confdir	$RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
+%define		sa_confdir	%{_sysconfdir}/mail/spamassassin
 
 %prep -q
 %setup -q -n %{pdir}-%{pnam}-%{version}
