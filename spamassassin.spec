@@ -30,6 +30,7 @@ BuildRequires:	perl-MIME-Base64
 BuildRequires:	perl-MIME-tools
 %endif
 BuildRequires:	rpm-perlprov >= 4.1-13
+Conflicts:	perl(Mail::SPF::Query) < 1.996
 Requires:	perl-Mail-SpamAssassin >= %{version}
 Obsoletes:	SpamAssassin
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
