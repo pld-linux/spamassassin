@@ -202,7 +202,7 @@ fi
 
 %files spamd
 %defattr(644,root,root,755)
-%doc spamd/*
+%doc spamd/README*
 %attr(754,root,root) /etc/rc.d/init.d/spamassassin
 %attr(600,root,root) %config(noreplace) /etc/sysconfig/spamassassin
 %attr(755,root,root) %{_bindir}/spamd
