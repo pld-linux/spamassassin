@@ -143,7 +143,8 @@ aplikacji do czytania poczty.
 	PREFIX=$RPM_BUILD_ROOT%{_prefix} \
 	SYSCONFDIR=$RPM_BUILD_ROOT%{_sysconfdir}
 	INST_PREFIX=%{_prefix} \
-	INST_SYSCONFDIR=%{_sysconfdir}
+	INST_SYSCONFDIR=%{_sysconfdir} \
+< /dev/null
 %{__make} OPTIMIZE="%{rpmcflags}"
 
 %{?_with_tests:%{__make} test}
