@@ -138,7 +138,11 @@ aplikacji do czytania poczty.
 %patch0 -p0
 
 %build
-%{__perl} Makefile.PL PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir}
+%{__perl} Makefile.PL \
+	PREFIX=%{_prefix} \
+	SYSCONFDIR=%{_sysconfdir} \
+< /dev/null
+
 %{__make} OPTIMIZE="%{rpmcflags}"
 
 %{?_with_tests:%{__make} test}
@@ -149,7 +153,7 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spam
 
 %{__make} install \
 	PREFIX=$RPM_BUILD_ROOT%{_prefix} \
-	SYSCONFDIR=$RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin \
+	SYSCONFDIR=$RPM_BUILD_ROOT/etc/mail/spamassassin \
 	INSTALLMAN1DIR=$RPM_BUILD_ROOT%{_mandir}/man1 \
 	INSTALLMAN3DIR=$RPM_BUILD_ROOT%{_mandir}/man3
 
