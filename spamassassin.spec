@@ -13,6 +13,7 @@ Release:	1
 License:	GPL v1+ or Artistic
 Group:		Applications/Mail
 Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
+# Source0-md5:	f4d7898301851c83ad157c0a59b98833
 Source1:	%{name}.sysconfig
 Patch0:		%{name}-rc-script.patch
 URL:		http://spamassassin.org/
