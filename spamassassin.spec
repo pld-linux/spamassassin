@@ -141,7 +141,7 @@ aplikacji do czytania poczty.
 %{__perl} Makefile.PL \
 	INSTALLDIRS=vendor \
 	PREFIX=$RPM_BUILD_ROOT%{_prefix} \
-	SYSCONFDIR=$RPM_BUILD_ROOT%{_sysconfdir}
+	SYSCONFDIR=$RPM_BUILD_ROOT%{_sysconfdir} \
 	INST_PREFIX=%{_prefix} \
 	INST_SYSCONFDIR=%{_sysconfdir} \
 < /dev/null
