@@ -5,16 +5,15 @@
 %include	/usr/lib/rpm/macros.perl
 %define	pdir	Mail
 %define	pnam	SpamAssassin
-%define pre	rc3
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
 Version:	3.0.0
-Release:	0.%{pre}.1
+Release:	1
 License:	GPL v1+ or Artistic
 Group:		Applications/Mail
-Source0:	http://spamassassin.apache.org/released/%{pdir}-%{pnam}-%{version}-%{pre}.tar.bz2
-# Source0-md5:	b12e809b682b562a0ae2202eabf7e3f2
+Source0:	http://www.apache.org/dist/spamassassin/%{pdir}-%{pnam}-%{version}.tar.bz2
+# Source0-md5:	b77c7b29ddc4283d597610bf540670d9
 Source1:	%{name}.sysconfig
 Source2:	%{name}-spamd.init
 URL:		http://spamassassin.org/
