@@ -1,0 +1,3 @@
+- perl(DBI) is not needed in most of the configurations
+- enabled tests
+- release 2
