@@ -1,6 +1,6 @@
 #
 # Conditional build:
-# _with_tests - perform "make test"
+%bcond_with  tests	# perform "make test"
 #
 %include	/usr/lib/rpm/macros.perl
 %define	pdir	Mail
@@ -20,7 +20,7 @@ URL:		http://spamassassin.org/
 BuildRequires:	openssl-devel >= 0.9.7c
 BuildRequires:	perl-devel >= 5.8
 BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
-%if %{?_with_tests:1}0
+%if %{with tests}
 BuildRequires:	perl-HTML-Parser >= 3
 # are these really needed?
 BuildRequires:	perl-MailTools
@@ -153,7 +153,7 @@ echo "postmaster@localhost" | \
 %{__make} \
 	OPTIMIZE="%{rpmcflags}"
 
-%{?_with_tests:%{__make} test}
+%{?with_tests:%{__make} test}
 
 %install
 rm -rf $RPM_BUILD_ROOT
