@@ -1,6 +1,6 @@
 #
 # Conditional build:
-# _with_tests - perform "make test"
+%bcond_with  tests	# perform "make test"
 #
 %include	/usr/lib/rpm/macros.perl
 %define	pdir	Mail
@@ -8,18 +8,18 @@
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
-Version:	2.61
+Version:	2.62
 Release:	1
 License:	GPL v1+ or Artistic
 Group:		Applications/Mail
 Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
-# Source0-md5:	6521ad3e6ed5a2eba35476c43c1697b7
+# Source0-md5:	e0cf85b038d85bb83083ee474763ed3c
 Source1:	%{name}.sysconfig
 Patch0:		%{name}-rc-script.patch
 URL:		http://spamassassin.org/
 BuildRequires:	openssl-devel >= 0.9.6k
 BuildRequires:	perl-devel >= 5.6
-%if %{?_with_tests:1}0
+%if %{with tests}
 BuildRequires:	perl-HTML-Parser >= 3
 # are these really needed?
 BuildRequires:	perl-MailTools
@@ -30,8 +30,8 @@ BuildRequires:	perl-MIME-tools
 BuildRequires:	rpm-perlprov >= 4.0.2-104
 Prereq:		/sbin/chkconfig
 Requires:	perl-Mail-SpamAssassin >= %{version}
-Buildroot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	SpamAssassin
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(DBI)'
 
@@ -148,7 +148,7 @@ echo "postmaster@localhost" | \
 	RUN_RAZOR2_TESTS=0
 %{__make} OPTIMIZE="%{rpmcflags}"
 
-%{?_with_tests:%{__make} test}
+%{?with_tests:%{__make} test}
 
 %install
 rm -rf $RPM_BUILD_ROOT
