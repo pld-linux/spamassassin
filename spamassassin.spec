@@ -164,6 +164,7 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spam
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamassassin
 install rules/local.cf $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
+install rules/languages $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
 
 # shouldn't this script be called `spamd' instead?
 install spamd/pld-rc-script.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/spamassassin
