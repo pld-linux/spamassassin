@@ -1,0 +1,35 @@
+--- Makefile.PL	Sat Jul 20 15:38:25 2002
++++ Makefile.PL.new	Sat Jul 20 15:39:53 2002
+@@ -1,6 +1,6 @@
+ require 5.005;
+ 
+-my $DEF_RULES_DIR	= '$(PREFIX)/share/spamassassin';
++my $DEF_RULES_DIR	= '$(DESTDIR)$(PREFIX)/share/spamassassin';
+ 
+ my $LOCAL_RULES_DIR	= '/etc/mail/spamassassin';
+ 
+@@ -83,7 +83,7 @@
+     # do this with MakeMaker without it trying to build the perl
+     # modules as .so's :(
+ 
+-qq{
++qq#
+ 
+ RULES		= $rulesfiles
+ 
+@@ -96,7 +96,7 @@
+ DEF_RULES_DIR	= $DEF_RULES_DIR
+ LOCAL_RULES_DIR	= $LOCAL_RULES_DIR
+ 
+-}. q{
++# . q#
+ 
+ pm_to_blib: spamassassin doc/.made
+ 
+@@ -153,5 +153,5 @@
+ 	touch doc/.made
+ 	-rm -f pod2htm*
+ 
+-};
++#;
+ }
