@@ -20,7 +20,7 @@ URL:		http://spamassassin.apache.org/
 BuildRequires:	openssl-devel >= 0.9.7d
 BuildRequires:	perl-devel >= 1:5.8.0
 BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
-BuildRequires:	perl(Digest::SHA1) >= 2.10
+BuildRequires:	perl-Digest-SHA1 >= 2.10
 %if %{with tests}
 BuildRequires:	perl-HTML-Parser >= 3
 # are these really needed?
@@ -47,16 +47,15 @@ spamd/spamc components which create a server that considerably speeds
 processing of mail.
 
 %description -l pl
-SpamAssassin udostêpnia Ci mo¿liwo¶æ zredukowania, je¶li nie
-kompletnego wyeliminowania Niezamawianej Komercyjnej Poczty
-(Unsolicited Commercial Email, spamu) z Twojej poczty. Mo¿e byæ
-wywo³ywany z MDA, np. Sendmaila czy Postfixa, lub z pliku ~/.forward
-itp. U¿ywa ogólnego algorytmu oceniania w celu identyfikacji
-wiadomo¶ci, które wygl±daj± na SPAM, po czym dodaje nag³ówki do
-wiadomo¶ci, umo¿liwiaj±c filtrowanie przez oprogramowanie u¿ytkownika.
-Ta dystrybucja zawiera programy spamd/spamc, umo¿liwiaj±ce
-uruchomienie serwera, co znacznie przyspieszy proces przetwarzania
-poczty.
+SpamAssassin daje mo¿liwo¶æ zredukowania, je¶li nie kompletnego
+wyeliminowania niezamawianej komercyjnej poczty (Unsolicited
+Commercial Email, spamu) z poczty. Mo¿e byæ wywo³ywany z MDA, np.
+Sendmaila czy Postfiksa, lub z pliku ~/.forward itp. U¿ywa ogólnego
+algorytmu oceniania w celu identyfikacji wiadomo¶ci, które wygl±daj±
+na SPAM, po czym dodaje nag³ówki do wiadomo¶ci, umo¿liwiaj±c
+filtrowanie przez oprogramowanie u¿ytkownika. Ta dystrybucja zawiera
+programy spamd/spamc, umo¿liwiaj±ce uruchomienie serwera, co znacznie
+przyspieszy proces przetwarzania poczty.
 
 %package tools
 Summary:	Miscleanous tools for SpamAssassin
@@ -69,8 +68,8 @@ Miscleanous tools from various authors, distributed with SpamAssassin.
 See /usr/share/doc/spamassassin-tools-*/.
 
 %description tools -l pl
-Przeró¿ne narzêdzia, dystrybuowane razem z SpamAssassin. Zobacz
-/usr/share/doc/spamassassin-tools-*/.
+Przeró¿ne narzêdzia, dystrybuowane razem ze SpamAssassinem. Wiêcej
+informacji w /usr/share/doc/spamassassin-tools-*/.
 
 %package spamd
 Summary:	spamd - daemonized version of spamassassin
@@ -110,7 +109,7 @@ whole spamassassin program.
 %description spamc -l pl
 Spamc powinien byæ u¿ywany zamiast "spamassassina" w skryptach
 przetwarzaj±cych pocztê. Zczytuje pocztê ze STDIN, kolejkuje j± a
-nastêpnie przekazuje spamd'owi, odczytuje wynik i podaje go na STDOUT.
+nastêpnie przekazuje spamdowi, odczytuje wynik i podaje go na STDOUT.
 Spamc stara siê nie obci±¿aæ zbytnio procesora podczas ³adowania,
 dziêki czemu powinien dzia³aæ szybciej ni¿ sam spamassassin.
 
