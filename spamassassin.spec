@@ -3,8 +3,8 @@
 %bcond_with  tests	# perform "make test"
 #
 %include	/usr/lib/rpm/macros.perl
-%define	pdir	Mail
-%define	pnam	SpamAssassin
+%define		pdir	Mail
+%define		pnam	SpamAssassin
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
