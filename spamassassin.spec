@@ -1,3 +1,6 @@
+#
+# Conditional build:
+# _without_tests - do not perform "make test"
 %include	/usr/lib/rpm/macros.perl
 %define	pdir	Mail
 %define	pnam	SpamAssassin
@@ -5,7 +8,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Group:		Applications/Mail
 Version:	2.41
-Release:	1
+Release:	2
 Name:		spamassassin
 License:	Artistic
 Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
@@ -13,12 +16,19 @@ Patch0:		spamassassin-rc-script.patch
 URL:		http://spamassassin.org/
 BuildRequires:	perl >= 5.6
 BuildRequires:	rpm-perlprov >= 3.0.3-16
+%if %{?_without_tests:0}%{!?_without_tests:1}
+BuildRequires:	perl-HTML-Parser >= 3
+# are these really needed?
+BuildRequires:	perl-MailTools
+BuildRequires:	perl-MIME-Base64
+BuildRequires:	perl-MIME-tools
+%endif
 Prereq:		/sbin/chkconfig
 Requires:	perl-Mail-SpamAssassin >= %{version}
 Obsoletes:	SpamAssassin
 Buildroot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)'
+%define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(DBI)'
 
 %description
 SpamAssassin provides you with a way to reduce if not completely
@@ -90,7 +100,8 @@ aplikacji do czytania poczty.
 %build
 %{__perl} Makefile.PL PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir}
 %{__make} OPTIMIZE="%{rpmcflags}" PREFIX=%{_prefix}
-#%make test
+
+%{!?_without_tests:%{__make} test}
 
 %install
 rm -rf $RPM_BUILD_ROOT
