@@ -1,0 +1,4 @@
+- separate spamd and spamc
+- remove HTML documentation (same as manuals)
+- turned off tests
+- release 5
