@@ -4,7 +4,7 @@
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Group:		Applications/Mail
-Version:	2.40
+Version:	2.41
 Release:	1
 Name:		spamassassin
 License:	Artistic
@@ -61,6 +61,7 @@ Przeró¿ne narzêdzia, dystrybuowane razem z SpamAssassin. Zobacz
 Summary:	%{pdir}::%{pnam} -- SpamAssassin e-mail filter Perl modules
 Summary(pl):	%{pdir}::%{pnam} -- modu³y Perla filtru poczty SpamAssassin
 Group:		Development/Languages/Perl
+Requires:	perl-HTML-Parser >= 3
 
 
 %description -n perl-Mail-SpamAssassin
@@ -97,8 +98,8 @@ install -d $RPM_BUILD_ROOT{%{sa_confdir},/etc/rc.d/init.d}
 
 %{__make} install \
 	PREFIX=$RPM_BUILD_ROOT%{_prefix} \
-	INSTALLMAN1DIR=$RPM_BUILD_ROOT%{_prefix}/share/man/man1 \
-	INSTALLMAN3DIR=$RPM_BUILD_ROOT%{_prefix}/share/man/man3 \
+	INSTALLMAN1DIR=$RPM_BUILD_ROOT%{_mandir}/man1 \
+	INSTALLMAN3DIR=$RPM_BUILD_ROOT%{_mandir}/man3 \
 	LOCAL_RULES_DIR=$RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
 
 install rules/local.cf $RPM_BUILD_ROOT%{sa_confdir}
@@ -131,7 +132,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc BUGS Changes COPYRIGHT INSTALL README TODO TRADEMARK
+%doc BUGS Changes COPYRIGHT INSTALL README TRADEMARK
 %doc sample-nonspam.txt sample-spam.txt spamd procmailrc.example
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_sysconfdir}/rc.d/init.d/spamassassin
