@@ -1,5 +1,3 @@
-# TODO:
-# - SECURITY: http://securitytracker.com/alerts/2004/Aug/1010903.html
 #
 # Conditional build:
 %bcond_with  tests	# perform "make test"
@@ -11,7 +9,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
 Version:	2.64
-Release:	0.2
+Release:	0.3
 License:	GPL v1+ or Artistic
 Group:		Applications/Mail
 Source0:	http://old.spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
