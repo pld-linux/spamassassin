@@ -9,7 +9,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
 Version:	2.50
-Release:	1
+Release:	2
 License:	GPL v1+ or Artistic
 Group:		Applications/Mail
 Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
@@ -19,7 +19,7 @@ URL:		http://spamassassin.org/
 BuildRequires:	perl >= 5.6
 BuildRequires:	rpm-perlprov >= 3.0.3-16
 BuildRequires:	openssl-devel
-%if %{?_with_tests:1}%{!?_with_tests:0}
+%if %{?_with_tests:1}0
 BuildRequires:	perl-HTML-Parser >= 3
 # are these really needed?
 BuildRequires:	perl-MailTools
@@ -111,8 +111,8 @@ Spamc stara siê nie obci±¿aæ zbytnio procesora podczas ³adowania,
 dziêki czemu powinien dzia³aæ szybciej ni¿ sam spamassassin.
 
 %package -n perl-Mail-SpamAssassin
-Summary:	%{pdir}::%{pnam} -- SpamAssassin e-mail filter Perl modules
-Summary(pl):	%{pdir}::%{pnam} -- modu³y Perla filtru poczty SpamAssassin
+Summary:	Mail::SpamAssassin -- SpamAssassin e-mail filter libraries
+Summary(pl):	Mail::SpamAssassin -- biblioteki filtru poczty SpamAssassin
 Group:		Development/Languages/Perl
 Requires:	perl-HTML-Parser >= 3
 
@@ -133,31 +133,31 @@ stworzon± wcze¶niej baz± regu³. Po zidentyfikowaniu, poczta mo¿e byæ
 oznaczona jako spam w celu pó¼niejszego wyfiltrowania, np. przy u¿yciu
 aplikacji do czytania poczty.
 
-%define		sa_confdir	%{_sysconfdir}/mail/spamassassin
-
 %prep -q
 %setup -q -n %{pdir}-%{pnam}-%{version}
 %patch0 -p0
 
 %build
-%{__perl} Makefile.PL PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir}
+%{__perl} Makefile.PL \
+	INSTALLDIRS=vendor \
+	PREFIX=$RPM_BUILD_ROOT%{_prefix} \
+	SYSCONFDIR=$RPM_BUILD_ROOT%{_sysconfdir}
+	INST_PREFIX=%{_prefix} \
+	INST_SYSCONFDIR=%{_sysconfdir}
 %{__make} OPTIMIZE="%{rpmcflags}"
 
 %{?_with_tests:%{__make} test}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{sa_confdir},/etc/{sysconfig,rc.d/init.d}}
+install -d $RPM_BUILD_ROOT/etc/{sysconfig,mail/spamassassin,rc.d/init.d}
 
 %{__make} install \
-	PREFIX=$RPM_BUILD_ROOT%{_prefix} \
-	SYSCONFDIR=$RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin \
 	INSTALLMAN1DIR=$RPM_BUILD_ROOT%{_mandir}/man1 \
 	INSTALLMAN3DIR=$RPM_BUILD_ROOT%{_mandir}/man3
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamassassin
-
-install rules/local.cf $RPM_BUILD_ROOT%{sa_confdir}
+install rules/local.cf $RPM_BUILD_ROOT/etc/mail/spamassassin
 
 # shouldn't this script be called `spamd' instead?
 install spamd/pld-rc-script.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/spamassassin
@@ -216,5 +216,5 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/mail/spamassassin/*
 %dir %{_datadir}/spamassassin
 %config(noreplace) %{_datadir}/spamassassin/*
-%{perl_sitelib}/Mail/*
+%{perl_vendorlib}/Mail/*
 %{_mandir}/man3/*
