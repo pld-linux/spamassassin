@@ -5,13 +5,13 @@ Summary:	%{pdir}::%{pnam} -- SpamAssassin e-mail filter Perl modules
 Summary(pl):	%{pdir}::%{pnam} -- modu³y Perla filtru poczty SpamAssassin
 Name:		perl-%{pdir}-%{pnam}
 Version:	2.31
-Release:	2
+Release:	3
 License:	GPL/Artistic
 Group:		Development/Languages/Perl
 Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
-Patch0:		findbin.patch
-Patch1:		spamassassin-makefile.patch
-Patch2:		spamassassin-rc-script.patch
+#Patch0:		findbin.patch
+Patch0:		spamassassin-makefile.patch
+Patch1:		spamassassin-rc-script.patch
 URL:		http://spamassassin.org/
 BuildRequires:	perl >= 5.6
 BuildRequires:	rpm-perlprov >= 3.0.3-16
@@ -82,9 +82,9 @@ Przeró¿ne narzêdzia, dystrybuowane razem z SpamAssassin. Zobacz
 
 %prep -q
 %setup -q -n %{pdir}-%{pnam}-%{version}
-%patch0 -p1
-%patch1 -p0
-%patch2 -p1
+#%patch0 -p1
+%patch0 -p0
+%patch1 -p1
 
 %build
 %{__perl} Makefile.PL PREFIX=%{_prefix}
