@@ -140,6 +140,7 @@ aplikacji do czytania poczty.
 %patch0 -p0
 
 %build
+echo "postmaster@localhost" | \
 %{__perl} Makefile.PL \
 	PREFIX=%{_prefix} \
 	SYSCONFDIR=%{_sysconfdir} \
