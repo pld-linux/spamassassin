@@ -1,0 +1,20 @@
+diff -ur Mail-SpamAssassin-2.51.orig/lib/Mail/SpamAssassin/Bayes.pm Mail-SpamAssassin-2.51/lib/Mail/SpamAssassin/Bayes.pm
+--- Mail-SpamAssassin-2.51.orig/lib/Mail/SpamAssassin/Bayes.pm	Wed Mar 19 00:27:46 2003
++++ Mail-SpamAssassin-2.51/lib/Mail/SpamAssassin/Bayes.pm	Sat Mar 22 20:01:07 2003
+@@ -199,6 +199,7 @@
+   my $self = {
+     'main'              => $main,
+     'log_raw_counts'	=> 0,
++    'conf'		=> $main->{conf},
+ 
+     # Off. See comment above cached_probs_get().
+     #'cached_probs'	=> { },
+@@ -217,7 +218,7 @@
+ 
+ sub finish {
+   my $self = shift;
+-  if (!$self->{conf}->{use_bayes}) { return; }
++  if (!$self->{main}->{conf}->{use_bayes}) { return; }
+   $self->{store}->untie_db();
+ }
+ 

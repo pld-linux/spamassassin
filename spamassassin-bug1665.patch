@@ -1,0 +1,151 @@
+diff -ur Mail-SpamAssassin-2.51.orig/lib/Mail/SpamAssassin/BayesStore.pm Mail-SpamAssassin-2.51/lib/Mail/SpamAssassin/BayesStore.pm
+--- Mail-SpamAssassin-2.51.orig/lib/Mail/SpamAssassin/BayesStore.pm	Tue Mar 18 21:38:40 2003
++++ Mail-SpamAssassin-2.51/lib/Mail/SpamAssassin/BayesStore.pm	Thu Mar 20 20:59:40 2003
+@@ -546,79 +546,98 @@
+ 
+ sub sync_journal {
+   my ($self, $opts) = @_;
++  my $ret = 0;
+ 
+   my $path = $self->get_journal_filename();
+ 
+-  if (!-f $path) { return 0; }
++  # if $path doesn't exist, or it's not a file, or is 0 bytes in length, return
++  if ( !stat($path) || !-f _ || -z _ ) { return 0; }
+ 
+-  # retire the journal, so we can update the db files from it in peace.
+-  # TODO: use locking here
+-  my $retirepath = $path.".old";
+-  if (!rename ($path, $retirepath)) {
+-    warn "bayes: failed rename $path to $retirepath\n";
++  eval {
++    local $SIG{'__DIE__'};	# do not run user die() traps in here
++    if ($self->tie_db_writable()) {
++      $ret = $self->sync_journal_trapped($opts, $path);
++    }
++  };
++  my $err = $@;
++
++  # ok, untie from write-mode, delete the retired journal
++  $self->untie_db();
++
++  # handle any errors that may have occurred
++  if ($err) {
++    warn "bayes: $err\n";
+     return 0;
+   }
+ 
++  $ret;
++}
++
++sub sync_journal_trapped {
++  my ($self, $opts, $path) = @_;
++
+   my $started = time();
+   my $count = 0;
+-
++  my $total_count = 0;
++  my %tokens = ();
+   my $showdots = $opts->{showdots};
++  my $retirepath = $path.".old";
+ 
+   # now read the retired journal
+-  if (!open (JOURNAL, "<".$retirepath)) {
+-    warn "bayes: cannot open read $retirepath\n";
+-    rename($retirepath,$path); # try to put it back if we can...
++  if (!open (JOURNAL, "<$path")) {
++    warn "bayes: cannot open read $path\n";
+     return 0;
+   }
+ 
+-  my $ok_to_remove = 0;
+-  eval {
+-    local $SIG{'__DIE__'};	# do not run user die() traps in here
++  # retire the journal, so we can update the db files from it in peace.
++  # TODO: use locking here
++  if (!rename ($path, $retirepath)) {
++    warn "bayes: failed rename $path to $retirepath\n";
++    close(JOURNAL);
++    return 0;
++  }
+ 
+-    if ($self->tie_db_writable()) {
+-      while (<JOURNAL>) {
+-        $count++;
+-        if (/^c (-?\d+) (-?\d+) (\d+) (.*)$/) {
+-          $self->tok_sync_counters ($1+0, $2+0, $3+0, $4);
+-        } elsif (/^t (\d+) (.*)$/) {
+-          $self->tok_touch_token ($1+0, $2);
+-        } elsif (/^n (-?\d+) (-?\d+)$/) {
+-          $self->tok_sync_nspam_nham ($1+0, $2+0);
+-        } else {
+-          warn "Bayes journal: gibberish: $_";
+-        }
+-
+-        if ($showdots && ($count % 1000) == 0) {
+-          print STDERR ".";
+-        }
+-      }
+-      $ok_to_remove = 1;
++  # Read the journal
++  while (<JOURNAL>) {
++    $total_count++;
++
++    if (/^t (\d+) (.*)$/) { # Token timestamp update, cache resultant entries
++      $tokens{$2} = $1+0;
++#   elsif (/^c (-?\d+) (-?\d+) (\d+) (.*)$/) { # Add/full token update
++#     $self->tok_sync_counters ($1+0, $2+0, $3+0, $4);
++#     $count++;
++#   } elsif (/^n (-?\d+) (-?\d+)$/) { # update ham/spam count
++#     $self->tok_sync_nspam_nham ($1+0, $2+0);
++#     $count++;
++    } else {
++      warn "Bayes journal: gibberish entry found: $_";
+     }
+-  };
+-  my $err = $@;
+-
+-  if ($showdots) { print STDERR "\n"; }
+ 
+-  # ok, untie from write-mode, delete the retired journal
+-  $self->untie_db();
+-  close JOURNAL;
+-  if ($ok_to_remove) {
+-    unlink ($retirepath);
++#    if ($showdots && ($count % 1000) == 0) {
++#      print STDERR ".";
++#    }
+   }
+-  else {
+-    warn "bayes: Detected problem syncing journal, trying to rename $retirepath to $path\n";
+-    rename($retirepath,$path) or warn "bayes: rename failed"; # try to put it back if we can...
+-
+-    # handle any errors that may have occurred
+-    if ($err) {
+-      warn "bayes: $err\n";
+-      return 0;
++  close JOURNAL;
++
++  # Now that we've determined what tokens we need to update and their
++  # final values, update the DB.  Should be much smaller than the full
++  # journal entries.
++  while( my($k,$v) = each %tokens ) {
++    $self->tok_touch_token ($v, $k);
++
++    if ($showdots && (++$count % 1000) == 0) {
++      print STDERR ".";
+     }
+   }
+ 
++  if ($showdots) { print STDERR "\n"; }
++
++  # we're all done, so unlink the old journal file
++  unlink ($retirepath) || warn "bayes: can't unlink $retirepath: $!\n";
++
+   my $done = time();
+   my $msg = ("synced Bayes databases from journal in ".($done - $started).
+-	" seconds: $count entries");
++	" seconds: $count unique entries ($total_count total entries)");
+ 
+   if ($opts->{verbose}) {
+     print $msg,"\n";
