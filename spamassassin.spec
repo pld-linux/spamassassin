@@ -5,21 +5,23 @@
 %include	/usr/lib/rpm/macros.perl
 %define	pdir	Mail
 %define	pnam	SpamAssassin
+%define pre	pre4
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
-Version:	2.64
-Release:	1
+Version:	3.0.0
+Release:	0.%{pre}.1
 License:	GPL v1+ or Artistic
 Group:		Applications/Mail
-Source0:	http://old.spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.bz2
-# Source0-md5:	cd482160ddbe371bbf4fb58b715ebbdf
+Source0:	http://spamassassin.apache.org/released/%{pdir}-%{pnam}-%{version}-%{pre}.tar.bz2
+# Source0-md5:	ffbc9664affc3e316eb78fb83820f9bf
 Source1:	%{name}.sysconfig
-Patch0:		%{name}-rc-script.patch
+Source2:	%{name}-spamd.init
 URL:		http://spamassassin.org/
 BuildRequires:	openssl-devel >= 0.9.7d
 BuildRequires:	perl-devel >= 1:5.8.0
 BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
+BuildRequires:	perl(Digest::SHA1) >= 2.10
 %if %{with tests}
 BuildRequires:	perl-HTML-Parser >= 3
 # are these really needed?
@@ -139,7 +141,6 @@ aplikacji do czytania poczty.
 
 %prep
 %setup -q -n %{pdir}-%{pnam}-%{version}
-%patch0 -p0
 
 %build
 echo "postmaster@localhost" | \
@@ -165,7 +166,7 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spam
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamassassin
 
 # shouldn't this script be called `spamd' instead?
-install spamd/pld-rc-script.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/spamassassin
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamassassin
 
 rm -f spamd/{*.sh,*.conf,spam*} contrib/snp.tar.gz
 
@@ -190,8 +191,8 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc BUGS Changes COPYRIGHT INSTALL README TRADEMARK USAGE
-%doc procmailrc.example
+%doc BUGS CREDITS Changes INSTALL README STATUS TRADEMARK UPGRADE USAGE
+%doc procmailrc.example sample*.txt
 %attr(755,root,root) %{_bindir}/sa-learn
 %attr(755,root,root) %{_bindir}/spamassassin
 %{_mandir}/man1/sa-learn*
