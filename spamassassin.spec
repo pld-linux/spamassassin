@@ -141,8 +141,8 @@ aplikacji do czytania poczty.
 %{__perl} Makefile.PL \
 	PREFIX=%{_prefix} \
 	SYSCONFDIR=%{_sysconfdir} \
-< /dev/null
-
+	RUN_RAZOR1_TESTS=0 \
+	RUN_RAZOR2_TESTS=0
 %{__make} OPTIMIZE="%{rpmcflags}"
 
 %{?_with_tests:%{__make} test}
