@@ -6,13 +6,14 @@
 %define	pnam	SpamAssassin
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
-Group:		Applications/Mail
-Version:	2.41
-Release:	5
 Name:		spamassassin
+Version:	2.41
+Release:	6
 License:	Artistic
+Group:		Applications/Mail
 Source0:	http://spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
-Patch0:		spamassassin-rc-script.patch
+Source1:	%{name}.sysconfig
+Patch0:		%{name}-rc-script.patch
 URL:		http://spamassassin.org/
 BuildRequires:	perl >= 5.6
 BuildRequires:	rpm-perlprov >= 3.0.3-16
@@ -25,8 +26,8 @@ BuildRequires:	perl-MIME-tools
 %endif
 Prereq:		/sbin/chkconfig
 Requires:	perl-Mail-SpamAssassin >= %{version}
-Obsoletes:	SpamAssassin
 Buildroot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+Obsoletes:	SpamAssassin
 
 %define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(DBI)'
 
@@ -74,7 +75,7 @@ Group:		Applications/Mail
 
 %description spamd
 The purpose of this program is to provide a daemonized version of the
-spamassassin executable.  The goal is improving throughput performance
+spamassassin executable. The goal is improving throughput performance
 for automated mail checking.
 
 This is intended to be used alongside "spamc", a fast, low-overhead C
@@ -89,11 +90,12 @@ Summary(pl):	spamc - klient dla spamd
 Group:		Applications/Mail
 
 %description spamc
-Spamc is the client half of the spamc/spamd pair.  It should be used in
-place of "spamassassin" in scripts to process mail.  It will read the mail
-from STDIN, and spool it to its connection to spamd, then read the result
-back and print it to STDOUT.  Spamc has extremely low overhead in loading,
-so it should be much faster to load than the whole spamassassin program.
+Spamc is the client half of the spamc/spamd pair. It should be used in
+place of "spamassassin" in scripts to process mail. It will read the
+mail from STDIN, and spool it to its connection to spamd, then read
+the result back and print it to STDOUT. Spamc has extremely low
+overhead in loading, so it should be much faster to load than the
+whole spamassassin program.
 
 # %description spamc -l pl
 # TODO
@@ -135,13 +137,15 @@ aplikacji do czytania poczty.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{sa_confdir},/etc/rc.d/init.d}
+install -d $RPM_BUILD_ROOT{%{sa_confdir},/etc/{sysconfig,rc.d/init.d}}
 
 %{__make} install \
 	PREFIX=$RPM_BUILD_ROOT%{_prefix} \
 	INSTALLMAN1DIR=$RPM_BUILD_ROOT%{_mandir}/man1 \
 	INSTALLMAN3DIR=$RPM_BUILD_ROOT%{_mandir}/man3 \
 	LOCAL_RULES_DIR=$RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
+
+install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamassassin
 
 install rules/local.cf $RPM_BUILD_ROOT%{sa_confdir}
 
@@ -151,9 +155,7 @@ install spamd/pld-rc-script.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/spamassassin
 rm -f spamd/{*.sh,*.conf,spam*} contrib/snp.tar.gz
 
 %post spamd
-if [ $1 = 1 ]; then
-	/sbin/chkconfig --add spamassassin
-fi
+/sbin/chkconfig --add spamassassin
 if [ -f /var/lock/subsys/spamassassin ]; then
 	/etc/rc.d/init.d/spamassassin restart 1>&2
 else
@@ -161,7 +163,7 @@ else
 fi
 
 %preun spamd
-if [ $1 = 0 ]; then
+if [ "$1" = "0" ]; then
 	if [ -f /var/lock/subsys/spamassassin ]; then
 		/etc/rc.d/init.d/spamassassin stop 1>&2
 	fi
@@ -185,7 +187,8 @@ rm -rf $RPM_BUILD_ROOT
 %files spamd
 %defattr(644,root,root,755)
 %doc spamd/*
-%attr(755,root,root) %{_sysconfdir}/rc.d/init.d/spamassassin
+%attr(754,root,root) /etc/rc.d/init.d/spamassassin
+%attr(600) %config(noreplace) /etc/sysconfig/spamassassin
 %attr(755,root,root) %{_bindir}/spamd
 %{_mandir}/man1/spamd*
 
