@@ -1,35 +1,34 @@
 #
 # Conditional build:
-%bcond_with  tests	# perform "make test"
+%bcond_with	tests		# perform "make test"
 #
 %include	/usr/lib/rpm/macros.perl
-%define	pdir	Mail
-%define	pnam	SpamAssassin
+%define		pdir	Mail
+%define		pnam	SpamAssassin
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
-Version:	2.64
-Release:	0.3
-License:	GPL v1+ or Artistic
+Version:	3.0.2
+Release:	2
+License:	Apache Software License v2
 Group:		Applications/Mail
-Source0:	http://old.spamassassin.org/released/%{pdir}-%{pnam}-%{version}.tar.gz
-# Source0-md5:	a82a9dab95462d102e253edb99091fdd
+Source0:	http://www.apache.org/dist/spamassassin/%{pdir}-%{pnam}-%{version}.tar.bz2
+# Source0-md5:	b373bc48c4f50b70cb784f40d88868bf
 Source1:	%{name}.sysconfig
-Patch0:		%{name}-rc-script.patch
-URL:		http://spamassassin.org/
+Source2:	%{name}-spamd.init
+Patch0:		%{name}-utf8_mode.patch
+URL:		http://spamassassin.apache.org/
 BuildRequires:	openssl-devel >= 0.9.6m
-BuildRequires:	perl-devel >= 5.6
-%if %{with tests}
+BuildRequires:	perl-devel >= 1:5.6.1
+BuildRequires:	perl-Digest-SHA1 >= 2.10
 BuildRequires:	perl-HTML-Parser >= 3
+%if %{with tests}
 # are these really needed?
 BuildRequires:	perl-MailTools
-BuildRequires:	perl-Mail-Audit
 BuildRequires:	perl-MIME-Base64
 BuildRequires:	perl-MIME-tools
 %endif
-BuildRequires:	rpm-perlprov >= 4.0.2-104
-PreReq:		rc-scripts
-Requires(post,preun):	/sbin/chkconfig
+BuildRequires:	rpm-perlprov >= 4.0.2-112.1
 Requires:	perl-Mail-SpamAssassin >= %{version}
 Obsoletes:	SpamAssassin
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -48,16 +47,15 @@ spamd/spamc components which create a server that considerably speeds
 processing of mail.
 
 %description -l pl
-SpamAssassin udostêpnia Ci mo¿liwo¶æ zredukowania, je¶li nie
-kompletnego wyeliminowania Niezamawianej Komercyjnej Poczty
-(Unsolicited Commercial Email, spamu) z Twojej poczty. Mo¿e byæ
-wywo³ywany z MDA, np. Sendmaila czy Postfixa, lub z pliku ~/.forward
-itp. U¿ywa ogólnego algorytmu oceniania w celu identyfikacji
-wiadomo¶ci, które wygl±daj± na SPAM, po czym dodaje nag³ówki do
-wiadomo¶ci, umo¿liwiaj±c filtrowanie przez oprogramowanie u¿ytkownika.
-Ta dystrybucja zawiera programy spamd/spamc, umo¿liwiaj±ce
-uruchomienie serwera, co znacznie przyspieszy proces przetwarzania
-poczty.
+SpamAssassin daje mo¿liwo¶æ zredukowania, je¶li nie kompletnego
+wyeliminowania niezamawianej komercyjnej poczty (Unsolicited
+Commercial Email, spamu) z poczty. Mo¿e byæ wywo³ywany z MDA, np.
+Sendmaila czy Postfiksa, lub z pliku ~/.forward itp. U¿ywa ogólnego
+algorytmu oceniania w celu identyfikacji wiadomo¶ci, które wygl±daj±
+na SPAM, po czym dodaje nag³ówki do wiadomo¶ci, umo¿liwiaj±c
+filtrowanie przez oprogramowanie u¿ytkownika. Ta dystrybucja zawiera
+programy spamd/spamc, umo¿liwiaj±ce uruchomienie serwera, co znacznie
+przyspieszy proces przetwarzania poczty.
 
 %package tools
 Summary:	Miscleanous tools for SpamAssassin
@@ -70,13 +68,15 @@ Miscleanous tools from various authors, distributed with SpamAssassin.
 See /usr/share/doc/spamassassin-tools-*/.
 
 %description tools -l pl
-Przeró¿ne narzêdzia, dystrybuowane razem z SpamAssassin. Zobacz
-/usr/share/doc/spamassassin-tools-*/.
+Przeró¿ne narzêdzia, dystrybuowane razem ze SpamAssassinem. Wiêcej
+informacji w /usr/share/doc/spamassassin-tools-*/.
 
 %package spamd
 Summary:	spamd - daemonized version of spamassassin
 Summary(pl):	spamd - spamassassin w postaci demona
 Group:		Applications/Mail
+PreReq:		rc-scripts
+Requires(post,preun):	/sbin/chkconfig
 
 %description spamd
 The purpose of this program is to provide a daemonized version of the
@@ -109,7 +109,7 @@ whole spamassassin program.
 %description spamc -l pl
 Spamc powinien byæ u¿ywany zamiast "spamassassina" w skryptach
 przetwarzaj±cych pocztê. Zczytuje pocztê ze STDIN, kolejkuje j± a
-nastêpnie przekazuje spamd'owi, odczytuje wynik i podaje go na STDOUT.
+nastêpnie przekazuje spamdowi, odczytuje wynik i podaje go na STDOUT.
 Spamc stara siê nie obci±¿aæ zbytnio procesora podczas ³adowania,
 dziêki czemu powinien dzia³aæ szybciej ni¿ sam spamassassin.
 
@@ -139,16 +139,20 @@ aplikacji do czytania poczty.
 
 %prep
 %setup -q -n %{pdir}-%{pnam}-%{version}
-%patch0 -p0
+%patch0 -p1
 
 %build
 echo "postmaster@localhost" | \
 %{__perl} Makefile.PL \
+	INSTALLDIRS=site \
 	PREFIX=%{_prefix} \
 	SYSCONFDIR=%{_sysconfdir} \
-	RUN_RAZOR1_TESTS=0 \
-	RUN_RAZOR2_TESTS=0
-%{__make} OPTIMIZE="%{rpmcflags}"
+	ENABLE_SSL=yes \
+	RUN_NET_TESTS=0 \
+	PERL_BIN=%{__perl}
+%{__make} \
+	CC="%{__cc}" \
+	OPTIMIZE="%{rpmcflags}"
 
 %{?with_tests:%{__make} test}
 
@@ -157,18 +161,17 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spamassassin}
 
 %{__make} install \
-	PREFIX=$RPM_BUILD_ROOT%{_prefix} \
-	INSTALLMAN1DIR=$RPM_BUILD_ROOT%{_mandir}/man1 \
-	INSTALLMAN3DIR=$RPM_BUILD_ROOT%{_mandir}/man3
+	DESTDIR=$RPM_BUILD_ROOT
 
-install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/spamassassin
-
-install rules/local.cf $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
+install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamassassin
 
 # shouldn't this script be called `spamd' instead?
-install spamd/pld-rc-script.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/spamassassin
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamassassin
 
 rm -f spamd/{*.sh,*.conf,spam*} contrib/snp.tar.gz
+
+%clean
+rm -rf $RPM_BUILD_ROOT
 
 %post spamd
 /sbin/chkconfig --add spamassassin
@@ -186,13 +189,10 @@ if [ "$1" = "0" ]; then
 	/sbin/chkconfig --del spamassassin
 fi
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %files
 %defattr(644,root,root,755)
-%doc BUGS Changes COPYRIGHT INSTALL README TRADEMARK USAGE
-%doc procmailrc.example
+%doc BUGS CREDITS Changes INSTALL README STATUS TRADEMARK UPGRADE USAGE
+%doc procmailrc.example sample*.txt
 %attr(755,root,root) %{_bindir}/sa-learn
 %attr(755,root,root) %{_bindir}/spamassassin
 %{_mandir}/man1/sa-learn*
@@ -204,7 +204,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files spamd
 %defattr(644,root,root,755)
-%doc spamd/*
+%doc spamd/README*
 %attr(754,root,root) /etc/rc.d/init.d/spamassassin
 %attr(600,root,root) %config(noreplace) /etc/sysconfig/spamassassin
 %attr(755,root,root) %{_bindir}/spamd
