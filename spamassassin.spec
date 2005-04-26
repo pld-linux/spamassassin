@@ -144,7 +144,6 @@ aplikacji do czytania poczty.
 %build
 echo "postmaster@localhost" | \
 %{__perl} Makefile.PL \
-	INSTALLDIRS=site \
 	PREFIX=%{_prefix} \
 	SYSCONFDIR=%{_sysconfdir} \
 	ENABLE_SSL=yes \
@@ -161,7 +160,10 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spamassassin}
 
 %{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT
+	PREFIX=$RPM_BUILD_ROOT%{_prefix} \
+	SYSCONFDIR=$RPM_BUILD_ROOT%{_sysconfdir} \
+	INSTALLMAN1DIR=$RPM_BUILD_ROOT%{_mandir}/man1 \
+	INSTALLMAN3DIR=$RPM_BUILD_ROOT%{_mandir}/man3
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamassassin
 
