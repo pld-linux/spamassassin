@@ -30,6 +30,7 @@ BuildRequires:	perl-MIME-tools
 %endif
 BuildRequires:	rpm-perlprov >= 4.0.2-112.1
 Requires:	perl-Mail-SpamAssassin >= %{version}
+Requires:	perl-Unicode-MapUTF8
 Obsoletes:	SpamAssassin
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
