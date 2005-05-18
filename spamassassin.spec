@@ -16,7 +16,6 @@ Source0:	http://www.apache.org/dist/spamassassin/%{pdir}-%{pnam}-%{version}.tar.
 # Source0-md5:	c9028e72958909285e43feb806d948dc
 Source1:	%{name}.sysconfig
 Source2:	%{name}-spamd.init
-Patch0:		%{name}-utf8_mode.patch
 URL:		http://spamassassin.apache.org/
 BuildRequires:	openssl-devel >= 0.9.6m
 BuildRequires:	perl-devel >= 1:5.6.1
@@ -140,7 +139,6 @@ aplikacji do czytania poczty.
 
 %prep
 %setup -q -n %{pdir}-%{pnam}-%{version}
-%patch0 -p1
 
 %build
 echo "postmaster@localhost" | \
