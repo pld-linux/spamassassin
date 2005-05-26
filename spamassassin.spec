@@ -10,7 +10,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
 Version:	3.0.3
-Release:	2
+Release:	3
 License:	Apache Software License v2
 Group:		Applications/Mail
 Source0:	http://www.apache.org/dist/spamassassin/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -80,6 +80,7 @@ Summary(pl):	spamd - spamassassin w postaci demona
 Group:		Applications/Mail
 PreReq:		rc-scripts
 Requires(post,preun):	/sbin/chkconfig
+Requires:	perl-Mail-SpamAssassin = %{version}
 
 %description spamd
 The purpose of this program is to provide a daemonized version of the
