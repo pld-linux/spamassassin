@@ -32,7 +32,7 @@ BuildRequires:	perl-MIME-Base64
 BuildRequires:	perl-MIME-tools
 %endif
 BuildRequires:	rpm-perlprov >= 4.1-13
-Requires:	perl-Mail-SpamAssassin >= %{version}
+Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Obsoletes:	SpamAssassin
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -80,7 +80,7 @@ Summary(pl):	spamd - spamassassin w postaci demona
 Group:		Applications/Mail
 PreReq:		rc-scripts
 Requires(post,preun):	/sbin/chkconfig
-Requires:	perl-Mail-SpamAssassin = %{version}
+Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 
 %description spamd
 The purpose of this program is to provide a daemonized version of the
