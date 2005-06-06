@@ -9,12 +9,12 @@
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
-Version:	3.0.3
-Release:	3
+Version:	3.0.4
+Release:	1
 License:	Apache Software License v2
 Group:		Applications/Mail
-Source0:	http://www.apache.org/dist/spamassassin/%{pdir}-%{pnam}-%{version}.tar.bz2
-# Source0-md5:	c9028e72958909285e43feb806d948dc
+Source0:	http://www.apache.org/dist/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
+# Source0-md5:	ba6e1bd95f6f9f3882f73212a11dbe46
 Source1:	%{name}.sysconfig
 Source2:	%{name}-spamd.init
 Patch0:		%{name}-prefork.patch
