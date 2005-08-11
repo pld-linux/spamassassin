@@ -1,7 +1,7 @@
 #
 # Conditional build:
 %bcond_with	tests		# perform "make test"
-%bcond_without  prefork		# don't apply prefork patch inspired by apache
+%bcond_without	prefork		# don't apply prefork patch inspired by apache
 #
 %include	/usr/lib/rpm/macros.perl
 %define		pdir	Mail
