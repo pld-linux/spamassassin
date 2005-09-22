@@ -133,6 +133,8 @@ Summary(pl):	Mail::SpamAssassin - biblioteki filtra poczty SpamAssassin
 Group:		Development/Languages/Perl
 Requires:	perl-HTML-Parser >= 3
 Requires:	perl-Cache-DB_File >= 0.2
+Requires:	perl-Sys-Hostname-Long
+Requires:	perl-Mail-SPF-Query
 
 %description -n perl-Mail-SpamAssassin
 Mail::SpamAssassin is a Mail::Audit plugin to identify spam using text
