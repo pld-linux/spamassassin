@@ -1,7 +1,6 @@
 #
 # Conditional build:
 %bcond_with	tests		# perform "make test"
-%bcond_without	prefork		# don't apply prefork patch inspired by apache
 #
 %include	/usr/lib/rpm/macros.perl
 %define		pdir	Mail
@@ -9,22 +8,32 @@
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
-Version:	3.0.4
-Release:	3
+Version:	3.1.0
+Release:	1
 License:	Apache Software License v2
 Group:		Applications/Mail
 Source0:	http://www.apache.org/dist/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
-# Source0-md5:	ba6e1bd95f6f9f3882f73212a11dbe46
+# Source0-md5:	d28bd7e83d01b234144e336bbfde0caa
 Source1:	%{name}.sysconfig
 Source2:	%{name}-spamd.init
-Patch0:		%{name}-prefork.patch
-Patch1:		%{name}-utf8_mode.patch
 URL:		http://spamassassin.apache.org/
 BuildRequires:	openssl-devel >= 0.9.7d
 BuildRequires:	perl-devel >= 1:5.8.0
+BuildRequires:	perl-Archive-Tar
+BuildRequires:	perl-DB_File
+BuildRequires:	perl-Net-DNS
+BuildRequires:	perl-Mail-SPF-Query
+BuildRequires:	perl-IP-Country
+BuildRequires:	perl-Net-Ident
+BuildRequires:	perl-IO-Socket-INET6
+BuildRequires:	perl-IO-Socket-SSL
+BuildRequires:	perl-IO-Zlib
+BuildRequires:	perl-DBI
 BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
 BuildRequires:	perl-Digest-SHA1 >= 2.10
 BuildRequires:	perl-HTML-Parser >= 3
+#BuildRequires:	perl-Razor2
+BuildRequires:	perl-libwww
 %if %{with tests}
 # are these really needed?
 BuildRequires:	perl-MailTools
@@ -144,8 +153,6 @@ aplikacji do czytania poczty.
 
 %prep
 %setup -q -n %{pdir}-%{pnam}-%{version}
-%{?with_prefork:%patch0 -p0}
-%patch1 -p1
 
 %build
 echo "postmaster@localhost" | \
@@ -154,7 +161,6 @@ echo "postmaster@localhost" | \
 	PREFIX=%{_prefix} \
 	SYSCONFDIR=%{_sysconfdir} \
 	ENABLE_SSL=yes \
-	RUN_NET_TESTS=0 \
 	PERL_BIN=%{__perl}
 %{__make} \
 	CC="%{__cc}" \
