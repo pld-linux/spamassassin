@@ -9,7 +9,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
 Version:	3.1.0
-Release:	1
+Release:	1.2
 License:	Apache Software License v2
 Group:		Applications/Mail
 Source0:	http://www.apache.org/dist/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -157,13 +157,13 @@ aplikacji do czytania poczty.
 %setup -q -n %{pdir}-%{pnam}-%{version}
 
 %build
-echo "postmaster@localhost" | \
 %{__perl} Makefile.PL \
 	INSTALLDIRS=vendor \
 	PREFIX=%{_prefix} \
 	SYSCONFDIR=%{_sysconfdir} \
 	ENABLE_SSL=yes \
-	PERL_BIN=%{__perl}
+	CONTACT_ADDRESS="postmaster@localhost" \
+	PERL_BIN=%{__perl} < /dev/null
 %{__make} \
 	CC="%{__cc}" \
 	OPTIMIZE="%{rpmcflags}"
@@ -181,8 +181,6 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamassassin
 
 # shouldn't this script be called `spamd' instead?
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamassassin
-
-rm -f spamd/{*.sh,*.conf,spam*} contrib/snp.tar.gz
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -206,15 +204,17 @@ fi
 %files
 %defattr(644,root,root,755)
 %doc BUGS CREDITS Changes INSTALL README STATUS TRADEMARK UPGRADE USAGE
-%doc procmailrc.example sample*.txt
+%doc procmailrc.example
 %attr(755,root,root) %{_bindir}/sa-learn
+%attr(755,root,root) %{_bindir}/sa-update
 %attr(755,root,root) %{_bindir}/spamassassin
 %{_mandir}/man1/sa-learn*
+%{_mandir}/man1/sa-update*
 %{_mandir}/man1/spamassassin*
 
 %files tools
 %defattr(644,root,root,755)
-%doc sql tools masses contrib
+%doc sql ldap tools masses contrib
 
 %files spamd
 %defattr(644,root,root,755)
