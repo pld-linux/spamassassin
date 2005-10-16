@@ -26,7 +26,7 @@ BuildRequires:	perl-Net-DNS
 BuildRequires:	perl-Mail-SPF-Query
 BuildRequires:	perl-IP-Country
 BuildRequires:	perl-Net-Ident
-BuildRequires:	perl-IO-Socket-INET6
+BuildRequires:	perl-IO-Socket-INET6 >= 2.51
 BuildRequires:	perl-IO-Socket-SSL
 BuildRequires:	perl-IO-Zlib
 BuildRequires:	perl-DBI
@@ -44,7 +44,6 @@ BuildRequires:	perl-MIME-tools
 BuildRequires:	rpm-perlprov >= 4.1-13
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Obsoletes:	SpamAssassin
-Conflicts:	perl-Net-DNS < 0.50
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(DBI)'
@@ -136,6 +135,8 @@ Requires:	perl-HTML-Parser >= 3
 Requires:	perl-Cache-DB_File >= 0.2
 Requires:	perl-Sys-Hostname-Long
 Requires:	perl-Mail-SPF-Query
+Conflicts:	perl-Net-DNS < 0.50
+Conflicts:	perl-IO-Socket-INET6 < 2.51
 
 %description -n perl-Mail-SpamAssassin
 Mail::SpamAssassin is a Mail::Audit plugin to identify spam using text
