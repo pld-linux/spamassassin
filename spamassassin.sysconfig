@@ -1,5 +1,5 @@
 # Customized settings for spamassassin (spamd)
 
 # Cmdline options 
+# to disable IPv6 add --ipv4-only
 SPAMD_OPTS="-d -c"
-
