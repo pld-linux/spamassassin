@@ -1,42 +1,37 @@
-Index: lib/Mail/SpamAssassin.pm
-===================================================================
---- lib/Mail/SpamAssassin.pm	(revision 322461)
-+++ lib/Mail/SpamAssassin.pm	(working copy)
-@@ -206,6 +206,11 @@
- override the settings for C<rules_filename>, C<site_rules_filename>,
- and C<userprefs_filename>.
- 
-+=item force_ipv4
-+
-+If set to 1, DNS tests will not attempt to use IPv6. Use if the existing tests
-+for IPv6 availablity produce incorrect results or crashes.
-+
- =item languages_filename
- 
- If you want to be able to use the language-guessing rule
-Index: lib/Mail/SpamAssassin/DnsResolver.pm
-===================================================================
---- lib/Mail/SpamAssassin/DnsResolver.pm	(revision 322461)
-+++ lib/Mail/SpamAssassin/DnsResolver.pm	(working copy)
+--- lib/Mail/SpamAssassin/DnsResolver.pm	Wed Sep 14 04:07:31 2005
++++ lib/Mail/SpamAssassin/DnsResolver.pm	Mon Oct 17 20:53:45 2005
 @@ -44,7 +44,7 @@
  use IO::Socket::INET;
  use Errno qw(EINVAL EADDRINUSE);
  
 -use constant HAS_SOCKET_INET6 => eval { require IO::Socket::INET6 };
-+use constant HAS_SOCKET_INET6 => eval { require IO::Socket::INET6; defined AF_INET6 };
++use constant HAS_SOCKET_INET6 => eval { require IO::Socket::INET6; };
  
  our @ISA = qw();
  
-@@ -81,13 +81,26 @@
+@@ -81,13 +81,39 @@
  
    if (defined $self->{res}) { return 1; }
    $self->{no_resolver} = 1;
 -
 +  # force only ipv4 if no IO::Socket::INET6 or ipv6 doesn't work
++  # to be safe test both ipv6 and ipv4 addresses in INET6
 +  my $force_ipv4 = (!HAS_SOCKET_INET6) || $self->{main}->{force_ipv4} ||
 +    !eval {
 +      my $sock6 = IO::Socket::INET6->new(
 +                                         LocalAddr => "::",
++                                         Proto     => 'udp',
++                                         );
++      if ($sock6) {
++        $sock6->close();
++        1;
++      }
++    } ||
++    !eval {
++      my $sock6 = IO::Socket::INET6->new(
++                                         LocalAddr => "0.0.0.0",
++                                         PeerAddr => "0.0.0.0",
++					 PeerPort => 53,
 +                                         Proto     => 'udp',
 +                                         );
 +      if ($sock6) {
@@ -56,7 +51,7 @@ Index: lib/Mail/SpamAssassin/DnsResolver.pm
        $self->{retrans} = 3;   # initial timeout for "non-backgrounded" query run in background
        $self->{res}->retry(1);           # If it fails, it fails
        $self->{res}->retrans(0);         # If it fails, it fails
-@@ -97,10 +110,12 @@
+@@ -97,10 +123,12 @@
        $self->{res}->udp_timeout(3);     # timeout of 3 seconds only
        $self->{res}->persistent_tcp(0);  # bug 3997
        $self->{res}->persistent_udp(0);  # bug 3997
@@ -69,7 +64,7 @@ Index: lib/Mail/SpamAssassin/DnsResolver.pm
    dbg("dns: is Net::DNS::Resolver available? " .
         ($self->{no_resolver} ? "no" : "yes"));
    if (!$self->{no_resolver} && defined $Net::DNS::VERSION) {
-@@ -123,7 +138,7 @@
+@@ -123,7 +151,7 @@
  
  =item $res->nameservers()
  
@@ -78,25 +73,41 @@ Index: lib/Mail/SpamAssassin/DnsResolver.pm
  
  =cut
  
-@@ -156,13 +171,14 @@
+@@ -156,20 +184,17 @@
    my $ip64 = IP_ADDRESS;
    my $ip4 = IPV4_ADDRESS;
    my $ns = $self->{res}->{nameservers}[0];
 -  my $ipv6 = 0;
-+  my $ipv6 = 0; # this will be set if we have an ipv6 nameserver
 +  my $ipv6opt = !($self->{force_ipv4});
  
-   # now, attempt to set the family to AF_INET6 if we can.  Some
-   # platforms don't have it (bug 4412 comment 29)...
-   # also, only set $ipv6 to true if that succeeds.
-   my $family;
+-  # now, attempt to set the family to AF_INET6 if we can.  Some
+-  # platforms don't have it (bug 4412 comment 29)...
+-  # also, only set $ipv6 to true if that succeeds.
+-  my $family;
 -  if (HAS_SOCKET_INET6 && $ns=~/^${ip64}$/o && $ns!~/^${ip4}$/o) {
+-    eval '$family = AF_INET6; $ipv6 = 1;';
+-  }
+-  if (!defined $family) {
+-    $family = AF_INET;       # that didn't work ;)
++  # ensure families of src and dest addresses match (bug 4412 comment 29)
++  my $srcaddr;
 +  if ($ipv6opt && $ns=~/^${ip64}$/o && $ns!~/^${ip4}$/o) {
-     eval '$family = AF_INET6; $ipv6 = 1;';
++    $srcaddr = "::";
++  } else {
++    $srcaddr = "0.0.0.0";
    }
-   if (!defined $family) {
-@@ -186,7 +202,7 @@
-         Domain => $family,
+ 
+-  dbg("dns: name server: $ns, family: $family, ipv6: $ipv6");
++  dbg("dns: name server: $ns, LocalAddr: $srcaddr");
+ 
+   # find next available unprivileged port (1024 - 65535)
+   # starting at a random value to spread out use of ports
+@@ -183,10 +208,10 @@
+         Proto => 'udp',
+         LocalPort => $lport,
+         Type => SOCK_DGRAM,
+-        Domain => $family,
++        LocalAddr => $srcaddr,
      );
  
 -    if (HAS_SOCKET_INET6) {
@@ -104,10 +115,31 @@ Index: lib/Mail/SpamAssassin/DnsResolver.pm
        $sock = IO::Socket::INET6->new(%args);
      } else {
        $sock = IO::Socket::INET->new(%args);
-Index: lib/spamassassin-run.pod
-===================================================================
---- lib/spamassassin-run.pod	(revision 322461)
-+++ lib/spamassassin-run.pod	(working copy)
+@@ -197,8 +222,6 @@
+     } elsif ($! == EADDRINUSE) {  # in use, let's try another source port
+       dbg("dns: UDP port $lport already in use, trying another port");
+     } else {
+-      # did we fail due to the attempted use of an IPv6 nameserver?
+-      $self->_ipv6_ns_warning()  if (!$ipv6 && $errno==EINVAL);
+       die "Error creating a DNS resolver socket: $errno";
+     }
+   }
+--- lib/Mail/SpamAssassin.pm	Wed Sep 14 04:07:31 2005
++++ lib/Mail/SpamAssassin.pm	Mon Oct 17 20:53:40 2005
+@@ -207,6 +207,11 @@
+ override the settings for C<rules_filename>, C<site_rules_filename>,
+ and C<userprefs_filename>.
+ 
++=item force_ipv4
++
++If set to 1, DNS tests will not attempt to use IPv6. Use if the existing tests
++for IPv6 availablity produce incorrect results or crashes.
++
+ =item languages_filename
+ 
+ If you want to be able to use the language-guessing rule
+--- lib/spamassassin-run.pod	Fri Aug 12 02:38:47 2005
++++ lib/spamassassin-run.pod	Mon Oct 17 20:53:40 2005
 @@ -59,6 +59,7 @@
   --add-addr-to-whitelist=addr      Add addr to persistent address whitelist
   --add-addr-to-blacklist=addr      Add addr to persistent address blacklist
@@ -129,10 +161,8 @@ Index: lib/spamassassin-run.pod
  =item B<-L>, B<--local>
  
  Do only the ''local'' tests, ones that do not require an internet connection to
-Index: spamassassin.raw
-===================================================================
---- spamassassin.raw	(revision 322461)
-+++ spamassassin.raw	(working copy)
+--- spamassassin.raw	Wed Sep 14 04:07:32 2005
++++ spamassassin.raw	Mon Oct 17 20:53:40 2005
 @@ -175,6 +175,7 @@
    'debug|D:s'                               => \$opt{'debug'},
    'error-code|exit-code|e:i'                => \$opt{'error-code'},
@@ -149,10 +179,8 @@ Index: spamassassin.raw
      local_tests_only    => $opt{'local'},
      debug               => $opt{'debug'},
      dont_copy_prefs     => ( $opt{'create-prefs'} ? 0 : 1 ),
-Index: spamd/spamd.raw
-===================================================================
---- spamd/spamd.raw	(revision 322461)
-+++ spamd/spamd.raw	(working copy)
+--- spamd/spamd.raw	Wed Sep 14 04:07:32 2005
++++ spamd/spamd.raw	Mon Oct 17 20:53:40 2005
 @@ -166,6 +166,7 @@
    'helper-home-dir|H:s'      => \$opt{'home_dir_for_helpers'},
    'help|h'                   => \$opt{'help'},
