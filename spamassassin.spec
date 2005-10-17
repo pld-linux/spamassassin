@@ -8,19 +8,32 @@
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
-Version:	3.0.4
-Release:	2
+Version:	3.1.0
+Release:	3
 License:	Apache Software License v2
 Group:		Applications/Mail
 Source0:	http://www.apache.org/dist/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
-# Source0-md5:	ba6e1bd95f6f9f3882f73212a11dbe46
+# Source0-md5:	d28bd7e83d01b234144e336bbfde0caa
 Source1:	%{name}.sysconfig
 Source2:	%{name}-spamd.init
+Patch0:		%{name}-bug-4619.patch
 URL:		http://spamassassin.apache.org/
 BuildRequires:	openssl-devel >= 0.9.6m
 BuildRequires:	perl-devel >= 1:5.6.1
+BuildRequires:	perl-Archive-Tar
+BuildRequires:	perl-DB_File
+BuildRequires:	perl-Net-DNS
+BuildRequires:	perl-Mail-SPF-Query
+BuildRequires:	perl-IP-Country
+BuildRequires:	perl-Net-Ident
+BuildRequires:	perl-IO-Socket-INET6 >= 2.51
+BuildRequires:	perl-IO-Socket-SSL
+BuildRequires:	perl-IO-Zlib
+BuildRequires:	perl-DBI
 BuildRequires:	perl-Digest-SHA1 >= 2.10
 BuildRequires:	perl-HTML-Parser >= 3
+#BuildRequires:	perl-Razor2
+BuildRequires:	perl-libwww
 %if %{with tests}
 # are these really needed?
 BuildRequires:	perl-MailTools
@@ -28,8 +41,7 @@ BuildRequires:	perl-MIME-Base64
 BuildRequires:	perl-MIME-tools
 %endif
 BuildRequires:	rpm-perlprov >= 4.0.2-112.1
-Requires:	perl-Mail-SpamAssassin >= %{version}
-Requires:	perl-Unicode-MapUTF8
+Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Obsoletes:	SpamAssassin
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -77,6 +89,7 @@ Summary(pl):	spamd - spamassassin w postaci demona
 Group:		Applications/Mail
 PreReq:		rc-scripts
 Requires(post,preun):	/sbin/chkconfig
+Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 
 %description spamd
 The purpose of this program is to provide a daemonized version of the
@@ -119,6 +132,10 @@ Summary(pl):	Mail::SpamAssassin - biblioteki filtra poczty SpamAssassin
 Group:		Development/Languages/Perl
 Requires:	perl-HTML-Parser >= 3
 Requires:	perl-Cache-DB_File >= 0.2
+Requires:	perl-Sys-Hostname-Long
+Requires:	perl-Mail-SPF-Query
+Conflicts:	perl-Net-DNS < 0.50
+Conflicts:	perl-IO-Socket-INET6 < 2.51
 
 %description -n perl-Mail-SpamAssassin
 Mail::SpamAssassin is a Mail::Audit plugin to identify spam using text
@@ -139,15 +156,15 @@ aplikacji do czytania poczty.
 
 %prep
 %setup -q -n %{pdir}-%{pnam}-%{version}
+%patch0 -p0
 
 %build
-echo "postmaster@localhost" | \
 %{__perl} Makefile.PL \
 	PREFIX=%{_prefix} \
 	SYSCONFDIR=%{_sysconfdir} \
 	ENABLE_SSL=yes \
-	RUN_NET_TESTS=0 \
-	PERL_BIN=%{__perl}
+	CONTACT_ADDRESS="postmaster@localhost" \
+	PERL_BIN=%{__perl} < /dev/null
 %{__make} \
 	CC="%{__cc}" \
 	OPTIMIZE="%{rpmcflags}"
@@ -168,8 +185,6 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamassassin
 
 # shouldn't this script be called `spamd' instead?
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamassassin
-
-rm -f spamd/{*.sh,*.conf,spam*} contrib/snp.tar.gz
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -193,21 +208,23 @@ fi
 %files
 %defattr(644,root,root,755)
 %doc BUGS CREDITS Changes INSTALL README STATUS TRADEMARK UPGRADE USAGE
-%doc procmailrc.example sample*.txt
+%doc procmailrc.example
 %attr(755,root,root) %{_bindir}/sa-learn
+%attr(755,root,root) %{_bindir}/sa-update
 %attr(755,root,root) %{_bindir}/spamassassin
 %{_mandir}/man1/sa-learn*
+%{_mandir}/man1/sa-update*
 %{_mandir}/man1/spamassassin*
 
 %files tools
 %defattr(644,root,root,755)
-%doc sql tools masses contrib
+%doc sql ldap tools masses contrib
 
 %files spamd
 %defattr(644,root,root,755)
 %doc spamd/README*
 %attr(754,root,root) /etc/rc.d/init.d/spamassassin
-%attr(600,root,root) %config(noreplace) /etc/sysconfig/spamassassin
+%attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/spamassassin
 %attr(755,root,root) %{_bindir}/spamd
 %{_mandir}/man1/spamd*
 
