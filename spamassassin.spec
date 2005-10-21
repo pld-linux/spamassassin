@@ -133,6 +133,7 @@ Summary(pl):	Mail::SpamAssassin - biblioteki filtra poczty SpamAssassin
 Group:		Development/Languages/Perl
 Requires:	perl-HTML-Parser >= 3
 Requires:	perl-Cache-DB_File >= 0.2
+Requires:	perl-IO-Socket-INET6 >= 2.51
 Requires:	perl-Sys-Hostname-Long
 Requires:	perl-Mail-SPF-Query
 Conflicts:	perl-Net-DNS < 0.50
