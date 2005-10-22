@@ -137,7 +137,6 @@ Requires:	perl-IO-Socket-INET6 >= 2.51
 Requires:	perl-Sys-Hostname-Long
 Requires:	perl-Mail-SPF-Query
 Conflicts:	perl-Net-DNS < 0.50
-Conflicts:	perl-IO-Socket-INET6 < 2.51
 
 %description -n perl-Mail-SpamAssassin
 Mail::SpamAssassin is a Mail::Audit plugin to identify spam using text
