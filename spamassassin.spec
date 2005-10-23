@@ -9,7 +9,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
 Version:	3.1.0
-Release:	3
+Release:	3.1
 License:	Apache Software License v2
 Group:		Applications/Mail
 Source0:	http://www.apache.org/dist/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -41,7 +41,6 @@ BuildRequires:	perl-MIME-Base64
 BuildRequires:	perl-MIME-tools
 %endif
 BuildRequires:	rpm-perlprov >= 4.0.2-112.1
-Requires:	perl-IO-Socket-INET6 >= 2.51
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Obsoletes:	SpamAssassin
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -133,10 +132,10 @@ Summary(pl):	Mail::SpamAssassin - biblioteki filtra poczty SpamAssassin
 Group:		Development/Languages/Perl
 Requires:	perl-HTML-Parser >= 3
 Requires:	perl-Cache-DB_File >= 0.2
+Requires:	perl-IO-Socket-INET6 >= 2.51
 Requires:	perl-Sys-Hostname-Long
 Requires:	perl-Mail-SPF-Query
 Conflicts:	perl-Net-DNS < 0.50
-Conflicts:	perl-IO-Socket-INET6 < 2.51
 
 %description -n perl-Mail-SpamAssassin
 Mail::SpamAssassin is a Mail::Audit plugin to identify spam using text
