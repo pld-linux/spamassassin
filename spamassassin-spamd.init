@@ -7,7 +7,7 @@
 # description: spamd is a daemon process which uses SpamAssassin to check \
 #              email messages for SPAM.  It is normally called by spamc \
 #              from a MDA.
-# processname: spamassassin
+# processname: spamd
 # pidfile:     /var/run/spamassassin.pid
 
 # Source function library.
