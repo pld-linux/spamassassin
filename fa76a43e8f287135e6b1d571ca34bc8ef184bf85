@@ -1,0 +1,5 @@
+- release 6,
+- clanups and adapaterize spec file,
+- standarize %post script,
+- separate spamd configuration in /etc/sysconfig/spamassassin file
+  (by Krzysztof Pobiezynski <ppv@wiedzmin.org>).
