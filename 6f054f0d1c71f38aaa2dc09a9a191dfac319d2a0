@@ -1,0 +1,8 @@
+- changed package names (daemon and tools, not perl-*) to lowercase for
+  easy upgrade from RH: perl -pi -e 's/^(%[a-z]+ -n SpamAssassin)/lc $1/e'
+- added obsoletes
+- added Summary(pl), fixed %doc
+- added %post and %preun scripts (chkconfig) for package spamassassin
+  (I'm not sure about names inconsistency: init.d/spamassassin <-> spamd)
+- moved %clean before %files, as in other perl specs
+- release 2
