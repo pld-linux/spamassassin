@@ -20,27 +20,27 @@ Patch0:		%{name}-bug-4619.patch
 Patch1:		%{name}-bug-4623.patch
 URL:		http://spamassassin.apache.org/
 BuildRequires:	openssl-devel >= 0.9.7d
-BuildRequires:	perl-devel >= 1:5.8.0
+BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
 BuildRequires:	perl-Archive-Tar
+BuildRequires:	perl-DBI
 BuildRequires:	perl-DB_File
-BuildRequires:	perl-Net-DNS
-BuildRequires:	perl-Mail-SPF-Query
-BuildRequires:	perl-IP-Country
-BuildRequires:	perl-Net-Ident
+BuildRequires:	perl-Digest-SHA1 >= 2.10
+BuildRequires:	perl-HTML-Parser >= 3
 BuildRequires:	perl-IO-Socket-INET6 >= 2.51
 BuildRequires:	perl-IO-Socket-SSL
 BuildRequires:	perl-IO-Zlib
-BuildRequires:	perl-DBI
-BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
-BuildRequires:	perl-Digest-SHA1 >= 2.10
-BuildRequires:	perl-HTML-Parser >= 3
+BuildRequires:	perl-IP-Country
+BuildRequires:	perl-Mail-SPF-Query
+BuildRequires:	perl-Net-DNS
+BuildRequires:	perl-Net-Ident
 #BuildRequires:	perl-Razor2
+BuildRequires:	perl-devel >= 1:5.8.0
 BuildRequires:	perl-libwww
 %if %{with tests}
 # are these really needed?
-BuildRequires:	perl-MailTools
 BuildRequires:	perl-MIME-Base64
 BuildRequires:	perl-MIME-tools
+BuildRequires:	perl-MailTools
 %endif
 BuildRequires:	rpm-perlprov >= 4.1-13
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
@@ -89,9 +89,9 @@ informacji w /usr/share/doc/spamassassin-tools-*/.
 Summary:	spamd - daemonized version of spamassassin
 Summary(pl):	spamd - spamassassin w postaci demona
 Group:		Applications/Mail
-PreReq:		rc-scripts
 Requires(post,preun):	/sbin/chkconfig
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
+Requires:	rc-scripts
 
 %description spamd
 The purpose of this program is to provide a daemonized version of the
@@ -132,11 +132,11 @@ dziêki czemu powinien dzia³aæ szybciej ni¿ sam spamassassin.
 Summary:	Mail::SpamAssassin - SpamAssassin e-mail filter libraries
 Summary(pl):	Mail::SpamAssassin - biblioteki filtra poczty SpamAssassin
 Group:		Development/Languages/Perl
-Requires:	perl-HTML-Parser >= 3
 Requires:	perl-Cache-DB_File >= 0.2
+Requires:	perl-HTML-Parser >= 3
 Requires:	perl-IO-Socket-INET6 >= 2.51
-Requires:	perl-Sys-Hostname-Long
 Requires:	perl-Mail-SPF-Query
+Requires:	perl-Sys-Hostname-Long
 Conflicts:	perl-Net-DNS < 0.50
 
 %description -n perl-Mail-SpamAssassin
