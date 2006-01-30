@@ -9,7 +9,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
 Version:	3.1.0
-Release:	5
+Release:	6
 License:	Apache Software License v2
 Group:		Applications/Mail
 Source0:	http://www.apache.org/dist/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -36,6 +36,7 @@ BuildRequires:	perl-Net-Ident
 #BuildRequires:	perl-Razor2
 BuildRequires:	perl-devel >= 1:5.8.0
 BuildRequires:	perl-libwww
+BuildRequires:	rpmbuild(macros) >= 1.268
 %if %{with tests}
 # are these really needed?
 BuildRequires:	perl-MIME-Base64
@@ -182,28 +183,31 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spam
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamassassin
+install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamd
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamd
 
-# shouldn't this script be called `spamd' instead?
-install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamassassin
+rm -f $RPM_BUILD_ROOT{%{perl_archlib}/perllocal.pod,%{perl_vendorarch}/auto/Mail/SpamAssassin/.packlist,%{perl_vendorlib}/spamassassin-run.pod}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %post spamd
-/sbin/chkconfig --add spamassassin
-if [ -f /var/lock/subsys/spamd ]; then
-	/etc/rc.d/init.d/spamassassin restart 1>&2
-else
-	echo 'Run "/etc/rc.d/init.d/spamassassin start" to start the spamd daemon.'
-fi
+/sbin/chkconfig --add spamd
+%service spamd restart
 
 %preun spamd
 if [ "$1" = "0" ]; then
-	if [ -f /var/lock/subsys/spamd ]; then
-		/etc/rc.d/init.d/spamassassin stop 1>&2
-	fi
-	/sbin/chkconfig --del spamassassin
+	%service spamd stop
+	/sbin/chkconfig --del spamd
+fi
+
+%triggerpostun spamd -- spamassassin-spamd < 3.1.0-5.3
+# temp hack, should we care of the dead link?
+ln -s spamd /etc/rc.d/init.d/spamassassin
+/sbin/chkconfig --del spamassassin
+rm -f /etc/rc.d/init.d/spamassassin
+if [ -f /etc/sysconfig/spamassassin.rpmsave ]; then
+	mv -f /etc/sysconfig/spamassassin.rpmsave /etc/sysconfig/spamd
 fi
 
 %files
@@ -224,8 +228,8 @@ fi
 %files spamd
 %defattr(644,root,root,755)
 %doc spamd/README*
-%attr(754,root,root) /etc/rc.d/init.d/spamassassin
-%attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/spamassassin
+%attr(754,root,root) /etc/rc.d/init.d/spamd
+%attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/spamd
 %attr(755,root,root) %{_bindir}/spamd
 %{_mandir}/man1/spamd*
 
