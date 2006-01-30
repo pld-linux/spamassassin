@@ -16,9 +16,10 @@
 # Source networking configuration.
 . /etc/sysconfig/network
 
+SPAMD_OPTS="-d -c"
 # Source configureation.
-if [ -f /etc/sysconfig/spamassassin ] ; then
-	. /etc/sysconfig/spamassassin
+if [ -f /etc/sysconfig/spamd ] ; then
+	. /etc/sysconfig/spamd
 fi
 
 # Check that networking is up.
