@@ -1,6 +1,6 @@
 #
 # Conditional build:
-%bcond_with	tests		# perform "make test"
+%bcond_without	tests		# perform "make test"
 #
 %include	/usr/lib/rpm/macros.perl
 %define		pdir	Mail
@@ -8,12 +8,12 @@
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
-Version:	3.1.1
+Version:	3.1.2
 Release:	1
 License:	Apache Software License v2
 Group:		Applications/Mail
 Source0:	http://www.apache.org/dist/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
-# Source0-md5:	33bc2bef2619135125ccf3b5a663be1d
+# Source0-md5:	e1fb14def1265d6d7351ba27b5940da2
 Source1:	%{name}.sysconfig
 Source2:	%{name}-spamd.init
 URL:		http://spamassassin.apache.org/
