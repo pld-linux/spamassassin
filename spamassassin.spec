@@ -182,7 +182,7 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spam
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamd
 
-rm -f $RPM_BUILD_ROOT{%{perl_archlib}/perllocal.pod,%{perl_vendorarch}/auto/Mail/SpamAssassin/.packlist,%{perl_vendorlib}/spamassassin-run.pod}
+rm -f $RPM_BUILD_ROOT{%{perl_archlib}/perllocal.pod,%{perl_vendorarch}/auto/Mail/SpamAssassin/.packlist,%{_mandir}/man3/spamassassin-run.*}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -216,6 +216,7 @@ fi
 %{_mandir}/man1/sa-learn*
 %{_mandir}/man1/sa-update*
 %{_mandir}/man1/spamassassin*
+%{perl_vendorlib}/spamassassin-run.pod
 
 %files tools
 %defattr(644,root,root,755)
