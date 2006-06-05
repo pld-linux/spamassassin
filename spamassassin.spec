@@ -2,6 +2,8 @@
 # Conditional build:
 %bcond_without	tests		# perform "make test"
 #
+# TODO: build lib{,ssl}spamc.so (if there is a point)
+#
 %include	/usr/lib/rpm/macros.perl
 %define		pdir	Mail
 %define		pnam	SpamAssassin
@@ -183,6 +185,8 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamd
 
 rm -f $RPM_BUILD_ROOT{%{perl_archlib}/perllocal.pod,%{perl_vendorarch}/auto/Mail/SpamAssassin/.packlist,%{_mandir}/man3/spamassassin-run.*}
+
+%{_fixperms} $RPM_BUILD_ROOT
 
 %clean
 rm -rf $RPM_BUILD_ROOT
