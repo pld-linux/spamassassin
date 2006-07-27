@@ -36,7 +36,7 @@ BuildRequires:	perl-Net-Ident
 #BuildRequires:	perl-Razor2
 BuildRequires:	perl-devel >= 1:5.8.0
 BuildRequires:	perl-libwww
-BuildRequires:	rpmbuild(macros) >= 1.268
+BuildRequires:	rpmbuild(macros) >= 1.310
 %if %{with tests}
 # are these really needed?
 BuildRequires:	perl-MIME-Base64
@@ -185,8 +185,6 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamd
 
 rm -f $RPM_BUILD_ROOT{%{perl_archlib}/perllocal.pod,%{perl_vendorarch}/auto/Mail/SpamAssassin/.packlist,%{_mandir}/man3/spamassassin-run.*}
-
-%{_fixperms} $RPM_BUILD_ROOT
 
 %clean
 rm -rf $RPM_BUILD_ROOT
