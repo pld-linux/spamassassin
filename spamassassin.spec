@@ -48,7 +48,7 @@ Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Obsoletes:	SpamAssassin
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(DBI)'
+%define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(DBI)' 'perl(Net::Ident)'
 
 %description
 SpamAssassin provides you with a way to reduce if not completely
