@@ -1,8 +1,9 @@
+# TODO
+# - build lib{,ssl}spamc.so (if there is a point)
+# - separate package for sa-update? (as it has extra perl deps)
 #
 # Conditional build:
 %bcond_without	tests		# perform "make test"
-#
-# TODO: build lib{,ssl}spamc.so (if there is a point)
 #
 %include	/usr/lib/rpm/macros.perl
 %define		pdir	Mail
@@ -11,7 +12,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
 Version:	3.1.4
-Release:	1
+Release:	1.1
 License:	Apache Software License v2
 Group:		Applications/Mail
 Source0:	http://www.apache.org/dist/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -45,6 +46,8 @@ BuildRequires:	perl-MailTools
 %endif
 BuildRequires:	rpm-perlprov >= 4.1-13
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
+# for sa-update
+Requires:	perl-Archive-Tar
 Obsoletes:	SpamAssassin
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -184,7 +187,11 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spam
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamd
 
+# sa-update dir
+install -d $RPM_BUILD_ROOT/var/lib/spamassassin/$(printf %d.%03d%03d $(echo %{version} | tr '.' ' '))
+
 rm -f $RPM_BUILD_ROOT{%{perl_archlib}/perllocal.pod,%{perl_vendorarch}/auto/Mail/SpamAssassin/.packlist,%{_mandir}/man3/spamassassin-run.*}
+rm -f $RPM_BUILD_ROOT%{perl_vendorlib}/spamassassin-run.pod
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -218,7 +225,8 @@ fi
 %{_mandir}/man1/sa-learn*
 %{_mandir}/man1/sa-update*
 %{_mandir}/man1/spamassassin*
-%{perl_vendorlib}/spamassassin-run.pod
+%dir /var/lib/spamassassin
+%dir /var/lib/spamassassin/*
 
 %files tools
 %defattr(644,root,root,755)
