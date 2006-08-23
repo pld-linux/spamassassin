@@ -12,7 +12,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
 Version:	3.1.4
-Release:	1.2
+Release:	1.6
 License:	Apache Software License v2
 Group:		Applications/Mail
 Source0:	http://www.apache.org/dist/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -201,8 +201,10 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spam
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamd
 
-# sa-update dir
+# sa-update dirs
 install -d $RPM_BUILD_ROOT/var/lib/spamassassin/$(printf %d.%03d%03d $(echo %{version} | tr '.' ' '))
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/sa-update-keys
+touch $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/sa-update-keys/{pubring,secring,trustdb}.gpg
 
 rm -f $RPM_BUILD_ROOT{%{perl_archlib}/perllocal.pod,%{perl_vendorarch}/auto/Mail/SpamAssassin/.packlist,%{_mandir}/man3/spamassassin-run.*}
 rm -f $RPM_BUILD_ROOT%{perl_vendorlib}/spamassassin-run.pod
@@ -257,17 +259,22 @@ fi
 
 %files update
 %defattr(644,root,root,755)
+%attr(700,root,root) %dir %{_sysconfdir}/mail/spamassassin/sa-update-keys
+%attr(700,root,root) %ghost %{_sysconfdir}/mail/spamassassin/sa-update-keys/*
 %attr(755,root,root) %{_bindir}/sa-update
-%{_mandir}/man1/sa-update*
+%{_datadir}/spamassassin/sa-update-pubkey.txt
 %dir /var/lib/spamassassin
 %dir /var/lib/spamassassin/*
+%{_mandir}/man1/sa-update*
 
 %files -n perl-Mail-SpamAssassin
 %defattr(644,root,root,755)
 %doc sample-nonspam.txt sample-spam.txt
 %dir %{_sysconfdir}/mail/spamassassin
-%config(noreplace) %{_sysconfdir}/mail/spamassassin/*
+%attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mail/spamassassin/*
+%exclude %{_sysconfdir}/mail/spamassassin/sa-update-keys
 %dir %{_datadir}/spamassassin
 %config(noreplace) %{_datadir}/spamassassin/*
+%exclude %{_datadir}/spamassassin/sa-update-pubkey.txt
 %{perl_vendorlib}/Mail/*
 %{_mandir}/man3/*
