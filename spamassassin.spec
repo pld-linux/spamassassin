@@ -1,6 +1,7 @@
 # TODO
 # - build lib{,ssl}spamc.so (if there is a point)
 # - separate package for sa-update? (as it has extra perl deps)
+# - ATTN: http://issues.apache.org/SpamAssassin/show_bug.cgi?id=5058
 #
 # Conditional build:
 %bcond_without	tests		# perform "make test"
@@ -48,6 +49,7 @@ BuildRequires:	rpm-perlprov >= 4.1-13
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 # for sa-update
 Requires:	perl-Archive-Tar
+Requires:	gnupg
 Obsoletes:	SpamAssassin
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
