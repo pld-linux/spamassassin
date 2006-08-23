@@ -1,6 +1,5 @@
 # TODO
 # - build lib{,ssl}spamc.so (if there is a point)
-# - separate package for sa-update? (as it has extra perl deps)
 # - ATTN: http://issues.apache.org/SpamAssassin/show_bug.cgi?id=5058
 #
 # Conditional build:
@@ -13,7 +12,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
 Name:		spamassassin
 Version:	3.1.4
-Release:	1.1
+Release:	1.2
 License:	Apache Software License v2
 Group:		Applications/Mail
 Source0:	http://www.apache.org/dist/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -47,9 +46,6 @@ BuildRequires:	perl-MailTools
 %endif
 BuildRequires:	rpm-perlprov >= 4.1-13
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
-# for sa-update
-Requires:	perl-Archive-Tar
-Requires:	gnupg
 Obsoletes:	SpamAssassin
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -133,6 +129,22 @@ przetwarzaj±cych pocztê. Zczytuje pocztê ze STDIN, kolejkuje j± a
 nastêpnie przekazuje spamdowi, odczytuje wynik i podaje go na STDOUT.
 Spamc stara siê nie obci±¿aæ zbytnio procesora podczas ³adowania,
 dziêki czemu powinien dzia³aæ szybciej ni¿ sam spamassassin.
+
+%package update
+Summary:	sa-update - automate SpamAssassin rule updates
+Group:		Applications/Mail
+Requires:	gnupg
+Requires:	perl-Archive-Tar
+Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
+
+%description update
+sa-update automates the process of downloading and installing new
+rules and configuration, based on channels. The default channel is
+updates.spamassassin.org, which has updated rules since the previous
+release.
+
+Update archives are verified by default using SHA1 hashes and GPG
+signatures.
 
 %package -n perl-Mail-SpamAssassin
 Summary:	Mail::SpamAssassin - SpamAssassin e-mail filter libraries
@@ -222,13 +234,9 @@ fi
 %doc BUGS CREDITS Changes INSTALL README STATUS TRADEMARK UPGRADE USAGE
 %doc procmailrc.example
 %attr(755,root,root) %{_bindir}/sa-learn
-%attr(755,root,root) %{_bindir}/sa-update
 %attr(755,root,root) %{_bindir}/spamassassin
 %{_mandir}/man1/sa-learn*
-%{_mandir}/man1/sa-update*
 %{_mandir}/man1/spamassassin*
-%dir /var/lib/spamassassin
-%dir /var/lib/spamassassin/*
 
 %files tools
 %defattr(644,root,root,755)
@@ -246,6 +254,13 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/spamc
 %{_mandir}/man1/spamc*
+
+%files update
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/sa-update
+%{_mandir}/man1/sa-update*
+%dir /var/lib/spamassassin
+%dir /var/lib/spamassassin/*
 
 %files -n perl-Mail-SpamAssassin
 %defattr(644,root,root,755)
