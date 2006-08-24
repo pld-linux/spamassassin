@@ -132,6 +132,7 @@ dziêki czemu powinien dzia³aæ szybciej ni¿ sam spamassassin.
 
 %package update
 Summary:	sa-update - automate SpamAssassin rule updates
+Summary(pl):	sa-update - automatyczne uaktualnianie regu³ek SpamAssassina
 Group:		Applications/Mail
 Requires:	gnupg
 Requires:	perl-Archive-Tar
@@ -145,6 +146,15 @@ release.
 
 Update archives are verified by default using SHA1 hashes and GPG
 signatures.
+
+%description update -l pl
+sa-update automatyzuje proces ¶ci±gania i instalowania nowych regu³ek
+i konfiguracji w oparciu o kana³y. Domy¶lny kana³ to
+updates.spamassassin.org, który ma uaktualnione regu³ki od czasu
+poprzedniego wydania.
+
+Archiwa uaktualnieñ s± sprawdzane domy¶lnei przy u¿yciu skrótów SHA1 i
+podpisów GPG.
 
 %package -n perl-Mail-SpamAssassin
 Summary:	Mail::SpamAssassin - SpamAssassin e-mail filter libraries
