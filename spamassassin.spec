@@ -153,7 +153,7 @@ i konfiguracji w oparciu o kana³y. Domy¶lny kana³ to
 updates.spamassassin.org, który ma uaktualnione regu³ki od czasu
 poprzedniego wydania.
 
-Archiwa uaktualnieñ s± sprawdzane domy¶lnei przy u¿yciu skrótów SHA1 i
+Archiwa uaktualnieñ s± sprawdzane domy¶lnie przy u¿yciu skrótów SHA1 i
 podpisów GPG.
 
 %package -n perl-Mail-SpamAssassin
