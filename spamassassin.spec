@@ -1,6 +1,5 @@
 # TODO
 # - build lib{,ssl}spamc.so (if there is a point)
-# - ATTN: http://issues.apache.org/SpamAssassin/show_bug.cgi?id=5058
 #
 # Conditional build:
 %bcond_without	tests		# perform "make test"
