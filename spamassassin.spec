@@ -1,7 +1,6 @@
 # TODO
 # - build lib{,ssl}spamc.so (if there is a point)
 # - ATTN: http://issues.apache.org/SpamAssassin/show_bug.cgi?id=5058
-# - put spamassassin-run.pod with proper location
 #
 # Conditional build:
 %bcond_without	tests		# perform "make test"
@@ -218,8 +217,6 @@ install -d $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/sa-update-keys
 touch $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/sa-update-keys/{pubring,secring,trustdb}.gpg
 
 rm -f $RPM_BUILD_ROOT{%{perl_archlib}/perllocal.pod,%{perl_vendorarch}/auto/Mail/SpamAssassin/.packlist,%{_mandir}/man3/spamassassin-run.*}
-# It's needed for help of spamassassin command. But needs fixes?
-rm -f $RPM_BUILD_ROOT%{perl_vendorlib}/spamassassin-run.pod
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -249,6 +246,8 @@ fi
 %doc procmailrc.example
 %attr(755,root,root) %{_bindir}/sa-learn
 %attr(755,root,root) %{_bindir}/spamassassin
+# It's needed for help of spamassassin command.
+%{perl_vendorlib}/spamassassin-run.pod
 %{_mandir}/man1/sa-learn*
 %{_mandir}/man1/spamassassin*
 
