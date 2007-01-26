@@ -92,8 +92,8 @@ Summary(pl):	spamd - spamassassin w postaci demona
 Group:		Applications/Mail
 Requires(post,preun):	/sbin/chkconfig
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
-Requires:	perl-IO-Socket-SSL
 Requires:	rc-scripts
+#Suggests:	perl-IO-Socket-SSL
 
 %description spamd
 The purpose of this program is to provide a daemonized version of the
