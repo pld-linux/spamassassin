@@ -8,7 +8,7 @@
 %define		pdir	Mail
 %define		pnam	SpamAssassin
 Summary:	A spam filter for email which can be invoked from mail delivery agents
-Summary(pl):	Filtr antyspamowy, przeznaczony dla programów dostarczaj±cych pocztê (MDA)
+Summary(pl.UTF-8):   Filtr antyspamowy, przeznaczony dla programÃ³w dostarczajÄ…cych pocztÄ™ (MDA)
 Name:		spamassassin
 Version:	3.1.7
 Release:	3
@@ -61,20 +61,20 @@ by the user's mail reading software. This distribution includes the
 spamd/spamc components which create a server that considerably speeds
 processing of mail.
 
-%description -l pl
-SpamAssassin daje mo¿liwo¶æ zredukowania, je¶li nie kompletnego
+%description -l pl.UTF-8
+SpamAssassin daje moÅ¼liwoÅ›Ä‡ zredukowania, jeÅ›li nie kompletnego
 wyeliminowania niezamawianej komercyjnej poczty (Unsolicited
-Commercial Email, spamu) z poczty. Mo¿e byæ wywo³ywany z MDA, np.
-Sendmaila czy Postfiksa, lub z pliku ~/.forward itp. U¿ywa ogólnego
-algorytmu oceniania w celu identyfikacji wiadomo¶ci, które wygl±daj±
-na SPAM, po czym dodaje nag³ówki do wiadomo¶ci, umo¿liwiaj±c
-filtrowanie przez oprogramowanie u¿ytkownika. Ta dystrybucja zawiera
-programy spamd/spamc, umo¿liwiaj±ce uruchomienie serwera, co znacznie
+Commercial Email, spamu) z poczty. MoÅ¼e byÄ‡ wywoÅ‚ywany z MDA, np.
+Sendmaila czy Postfiksa, lub z pliku ~/.forward itp. UÅ¼ywa ogÃ³lnego
+algorytmu oceniania w celu identyfikacji wiadomoÅ›ci, ktÃ³re wyglÄ…dajÄ…
+na SPAM, po czym dodaje nagÅ‚Ã³wki do wiadomoÅ›ci, umoÅ¼liwiajÄ…c
+filtrowanie przez oprogramowanie uÅ¼ytkownika. Ta dystrybucja zawiera
+programy spamd/spamc, umoÅ¼liwiajÄ…ce uruchomienie serwera, co znacznie
 przyspieszy proces przetwarzania poczty.
 
 %package tools
 Summary:	Miscleanous tools for SpamAssassin
-Summary(pl):	Przeró¿ne narzêdzia zwi±zane z SpamAssassin
+Summary(pl.UTF-8):   PrzerÃ³Å¼ne narzÄ™dzia zwiÄ…zane z SpamAssassin
 Group:		Applications/Mail
 Obsoletes:	SpamAssassin-tools
 
@@ -82,13 +82,13 @@ Obsoletes:	SpamAssassin-tools
 Miscleanous tools from various authors, distributed with SpamAssassin.
 See /usr/share/doc/spamassassin-tools-*/.
 
-%description tools -l pl
-Przeró¿ne narzêdzia, dystrybuowane razem ze SpamAssassinem. Wiêcej
+%description tools -l pl.UTF-8
+PrzerÃ³Å¼ne narzÄ™dzia, dystrybuowane razem ze SpamAssassinem. WiÄ™cej
 informacji w /usr/share/doc/spamassassin-tools-*/.
 
 %package spamd
 Summary:	spamd - daemonized version of spamassassin
-Summary(pl):	spamd - spamassassin w postaci demona
+Summary(pl.UTF-8):   spamd - spamassassin w postaci demona
 Group:		Applications/Mail
 Requires(post,preun):	/sbin/chkconfig
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
@@ -103,16 +103,16 @@ for automated mail checking.
 This is intended to be used alongside "spamc", a fast, low-overhead C
 client program.
 
-%description spamd -l pl
-Spamd jest "demoniczn±" wersj± spamassassina. Jego zadaniem jest
-poprawa wydajno¶ci automatycznego sprawdzania poczty.
+%description spamd -l pl.UTF-8
+Spamd jest "demonicznÄ…" wersjÄ… spamassassina. Jego zadaniem jest
+poprawa wydajnoÅ›ci automatycznego sprawdzania poczty.
 
-Spamd powinien byæ u¿ywany wespó³ ze "spamc", który jest szybkim i
+Spamd powinien byÄ‡ uÅ¼ywany wespÃ³Å‚ ze "spamc", ktÃ³ry jest szybkim i
 wydajnym programem klienckim.
 
 %package spamc
 Summary:	spamc - client for spamd
-Summary(pl):	spamc - klient dla spamd
+Summary(pl.UTF-8):   spamc - klient dla spamd
 Group:		Applications/Mail
 
 %description spamc
@@ -123,16 +123,16 @@ the result back and print it to STDOUT. Spamc has extremely low
 overhead in loading, so it should be much faster to load than the
 whole spamassassin program.
 
-%description spamc -l pl
-Spamc powinien byæ u¿ywany zamiast "spamassassina" w skryptach
-przetwarzaj±cych pocztê. Zczytuje pocztê ze STDIN, kolejkuje j± a
-nastêpnie przekazuje spamdowi, odczytuje wynik i podaje go na STDOUT.
-Spamc stara siê nie obci±¿aæ zbytnio procesora podczas ³adowania,
-dziêki czemu powinien dzia³aæ szybciej ni¿ sam spamassassin.
+%description spamc -l pl.UTF-8
+Spamc powinien byÄ‡ uÅ¼ywany zamiast "spamassassina" w skryptach
+przetwarzajÄ…cych pocztÄ™. Zczytuje pocztÄ™ ze STDIN, kolejkuje jÄ… a
+nastÄ™pnie przekazuje spamdowi, odczytuje wynik i podaje go na STDOUT.
+Spamc stara siÄ™ nie obciÄ…Å¼aÄ‡ zbytnio procesora podczas Å‚adowania,
+dziÄ™ki czemu powinien dziaÅ‚aÄ‡ szybciej niÅ¼ sam spamassassin.
 
 %package update
 Summary:	sa-update - automate SpamAssassin rule updates
-Summary(pl):	sa-update - automatyczne uaktualnianie regu³ek SpamAssassina
+Summary(pl.UTF-8):   sa-update - automatyczne uaktualnianie reguÅ‚ek SpamAssassina
 Group:		Applications/Mail
 Requires:	gnupg
 Requires:	perl-Archive-Tar
@@ -147,18 +147,18 @@ release.
 Update archives are verified by default using SHA1 hashes and GPG
 signatures.
 
-%description update -l pl
-sa-update automatyzuje proces ¶ci±gania i instalowania nowych regu³ek
-i konfiguracji w oparciu o kana³y. Domy¶lny kana³ to
-updates.spamassassin.org, który ma uaktualnione regu³ki od czasu
+%description update -l pl.UTF-8
+sa-update automatyzuje proces Å›ciÄ…gania i instalowania nowych reguÅ‚ek
+i konfiguracji w oparciu o kanaÅ‚y. DomyÅ›lny kanaÅ‚ to
+updates.spamassassin.org, ktÃ³ry ma uaktualnione reguÅ‚ki od czasu
 poprzedniego wydania.
 
-Archiwa uaktualnieñ s± sprawdzane domy¶lnie przy u¿yciu skrótów SHA1 i
-podpisów GPG.
+Archiwa uaktualnieÅ„ sÄ… sprawdzane domyÅ›lnie przy uÅ¼yciu skrÃ³tÃ³w SHA1 i
+podpisÃ³w GPG.
 
 %package -n perl-Mail-SpamAssassin
 Summary:	Mail::SpamAssassin - SpamAssassin e-mail filter libraries
-Summary(pl):	Mail::SpamAssassin - biblioteki filtra poczty SpamAssassin
+Summary(pl.UTF-8):   Mail::SpamAssassin - biblioteki filtra poczty SpamAssassin
 Group:		Development/Languages/Perl
 Requires:	perl-Cache-DB_File >= 0.2
 Requires:	perl-HTML-Parser >= 3
@@ -175,13 +175,13 @@ body text to identify ``spam'', also known as unsolicited commercial
 email. Once identified, the mail can then be optionally tagged as spam
 for later filtering using the user's own mail user-agent application.
 
-%description -n perl-Mail-SpamAssassin -l pl
-Mail::SpamAssassin jest pluginem dla Mail::Audit, s³u¿±cym do
-identyfikacji spamu przy u¿yciu analizy zawarto¶ci i/lub internetowych
+%description -n perl-Mail-SpamAssassin -l pl.UTF-8
+Mail::SpamAssassin jest pluginem dla Mail::Audit, sÅ‚uÅ¼Ä…cym do
+identyfikacji spamu przy uÅ¼yciu analizy zawartoÅ›ci i/lub internetowych
 czarnych list. Do zidentyfikowania jako ,,spam'' stosuje szeroki
-zakres testów heurystycznych na nag³ówkach i tre¶ci, posi³kuj±c siê
-stworzon± wcze¶niej baz± regu³. Po zidentyfikowaniu, poczta mo¿e byæ
-oznaczona jako spam w celu pó¼niejszego wyfiltrowania, np. przy u¿yciu
+zakres testÃ³w heurystycznych na nagÅ‚Ã³wkach i treÅ›ci, posiÅ‚kujÄ…c siÄ™
+stworzonÄ… wczeÅ›niej bazÄ… reguÅ‚. Po zidentyfikowaniu, poczta moÅ¼e byÄ‡
+oznaczona jako spam w celu pÃ³Åºniejszego wyfiltrowania, np. przy uÅ¼yciu
 aplikacji do czytania poczty.
 
 %prep
