@@ -136,6 +136,7 @@ Summary(pl.UTF-8):   sa-update - automatyczne uaktualnianie regułek SpamAssassi
 Group:		Applications/Mail
 Requires:	gnupg
 Requires:	perl-Archive-Tar
+Requires:	perl-libwww
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 
 %description update
