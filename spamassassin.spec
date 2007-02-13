@@ -8,7 +8,7 @@
 %define		pdir	Mail
 %define		pnam	SpamAssassin
 Summary:	A spam filter for email which can be invoked from mail delivery agents
-Summary(pl.UTF-8):   Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
+Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
 Version:	3.1.7
 Release:	3
@@ -74,7 +74,7 @@ przyspieszy proces przetwarzania poczty.
 
 %package tools
 Summary:	Miscleanous tools for SpamAssassin
-Summary(pl.UTF-8):   Przeróżne narzędzia związane z SpamAssassin
+Summary(pl.UTF-8):	Przeróżne narzędzia związane z SpamAssassin
 Group:		Applications/Mail
 Obsoletes:	SpamAssassin-tools
 
@@ -88,7 +88,7 @@ informacji w /usr/share/doc/spamassassin-tools-*/.
 
 %package spamd
 Summary:	spamd - daemonized version of spamassassin
-Summary(pl.UTF-8):   spamd - spamassassin w postaci demona
+Summary(pl.UTF-8):	spamd - spamassassin w postaci demona
 Group:		Applications/Mail
 Requires(post,preun):	/sbin/chkconfig
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
@@ -112,7 +112,7 @@ wydajnym programem klienckim.
 
 %package spamc
 Summary:	spamc - client for spamd
-Summary(pl.UTF-8):   spamc - klient dla spamd
+Summary(pl.UTF-8):	spamc - klient dla spamd
 Group:		Applications/Mail
 
 %description spamc
@@ -132,7 +132,7 @@ dzięki czemu powinien działać szybciej niż sam spamassassin.
 
 %package update
 Summary:	sa-update - automate SpamAssassin rule updates
-Summary(pl.UTF-8):   sa-update - automatyczne uaktualnianie regułek SpamAssassina
+Summary(pl.UTF-8):	sa-update - automatyczne uaktualnianie regułek SpamAssassina
 Group:		Applications/Mail
 Requires:	gnupg
 Requires:	perl-Archive-Tar
@@ -159,7 +159,7 @@ podpisów GPG.
 
 %package -n perl-Mail-SpamAssassin
 Summary:	Mail::SpamAssassin - SpamAssassin e-mail filter libraries
-Summary(pl.UTF-8):   Mail::SpamAssassin - biblioteki filtra poczty SpamAssassin
+Summary(pl.UTF-8):	Mail::SpamAssassin - biblioteki filtra poczty SpamAssassin
 Group:		Development/Languages/Perl
 Requires:	perl-Cache-DB_File >= 0.2
 Requires:	perl-HTML-Parser >= 3
