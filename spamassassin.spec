@@ -15,7 +15,7 @@ Release:	0.1
 License:	Apache Software License v2
 Group:		Applications/Mail
 Source0:	http://www.apache.net.pl/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
-# Source0-md5:	6daf599fe9a4fc0d979ee9cac9a8d256
+# Source0-md5:	e8184a9a4ff11da5bd20b294cfeac7ac
 Source1:	%{name}.sysconfig
 Source2:	%{name}-spamd.init
 URL:		http://spamassassin.apache.org/
