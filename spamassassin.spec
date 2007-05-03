@@ -2,7 +2,7 @@
 # - build lib{,ssl}spamc.so (if there is a point)
 #
 # Conditional build:
-%bcond_without	tests		# perform "make test"
+%bcond_without	tests		# do not perform "make test"
 #
 %include	/usr/lib/rpm/macros.perl
 %define		pdir	Mail
@@ -10,12 +10,12 @@
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
-Version:	3.1.8
-Release:	1
+Version:	3.2.0
+Release:	0.1
 License:	Apache Software License v2
 Group:		Applications/Mail
 Source0:	http://www.apache.net.pl/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
-# Source0-md5:	e8184a9a4ff11da5bd20b294cfeac7ac
+# Source0-md5:	6840e3be132e2c3cbf66298b0227e880
 Source1:	%{name}.sysconfig
 Source2:	%{name}-spamd.init
 URL:		http://spamassassin.apache.org/
@@ -39,9 +39,15 @@ BuildRequires:	perl-libwww
 BuildRequires:	rpmbuild(macros) >= 1.310
 %if %{with tests}
 # are these really needed?
+BuildRequires:	perl-Encode-Detect
 BuildRequires:	perl-MIME-Base64
 BuildRequires:	perl-MIME-tools
+BuildRequires:	perl-Mail-DKIM
+BuildRequires:	perl-Mail-DomainKeys
+BuildRequires:	perl-Mail-SPF
 BuildRequires:	perl-MailTools
+BuildRequires:	perl-Razor > 2.61
+BUildRequires:	perl-Compress-Zlib
 %endif
 BuildRequires:	rpm-perlprov >= 4.1-13
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
@@ -136,8 +142,8 @@ Summary(pl.UTF-8):	sa-update - automatyczne uaktualnianie regułek SpamAssassina
 Group:		Applications/Mail
 Requires:	gnupg
 Requires:	perl-Archive-Tar
-Requires:	perl-libwww
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
+Requires:	perl-libwww
 
 %description update
 sa-update automates the process of downloading and installing new
@@ -247,10 +253,12 @@ fi
 %defattr(644,root,root,755)
 %doc BUGS CREDITS Changes INSTALL README STATUS TRADEMARK UPGRADE USAGE
 %doc procmailrc.example
+%attr(755,root,root) %{_bindir}/sa-compile
 %attr(755,root,root) %{_bindir}/sa-learn
 %attr(755,root,root) %{_bindir}/spamassassin
 # It's needed for help of spamassassin command.
 %{perl_vendorlib}/spamassassin-run.pod
+%{_mandir}/man1/sa-compile*
 %{_mandir}/man1/sa-learn*
 %{_mandir}/man1/spamassassin*
 
