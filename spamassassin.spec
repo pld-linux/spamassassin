@@ -251,7 +251,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc BUGS CREDITS Changes INSTALL README STATUS TRADEMARK UPGRADE USAGE
+%doc CREDITS Changes INSTALL README TRADEMARK UPGRADE USAGE
 %doc procmailrc.example
 %attr(755,root,root) %{_bindir}/sa-compile
 %attr(755,root,root) %{_bindir}/sa-learn
@@ -264,7 +264,7 @@ fi
 
 %files tools
 %defattr(644,root,root,755)
-%doc sql ldap tools masses contrib
+%doc sql ldap
 
 %files spamd
 %defattr(644,root,root,755)
