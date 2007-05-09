@@ -1,5 +1,7 @@
 # TODO
 # - build lib{,ssl}spamc.so (if there is a point)
+# - Build (with tests) has perl-Mail-SPF and perl-Mail-SPF-Query in BR, but
+#   they both package spfquery which makes poldek collide packages
 #
 # Conditional build:
 %bcond_without	tests		# do not perform "make test"
