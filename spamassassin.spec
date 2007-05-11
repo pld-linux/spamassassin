@@ -2,6 +2,9 @@
 # - build lib{,ssl}spamc.so (if there is a point)
 # - Build (with tests) has perl-Mail-SPF and perl-Mail-SPF-Query in BR, but
 #   they both package spfquery which makes poldek collide packages
+# - separate "compile" subpackage (sa-compile) with R: EU::MM, re2c, gcc
+# - kill "update" subpackage and move it to perl-Mail-SpamAssassin?
+#   it's `strongly recommended' in 3.2.0 (instead of `optional').
 #
 # Conditional build:
 %bcond_without	tests		# do not perform "make test"
@@ -13,7 +16,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
 Version:	3.2.0
-Release:	1
+Release:	2
 License:	Apache Software License v2
 Group:		Applications/Mail
 Source0:	http://www.apache.net.pl/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -54,6 +57,7 @@ BUildRequires:	perl-Compress-Zlib
 BuildRequires:	rpm-perlprov >= 4.1-13
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Obsoletes:	SpamAssassin
+Suggests:	spamassassin-update
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(DBI)' 'perl(Net::Ident)'
@@ -101,7 +105,8 @@ Group:		Applications/Mail
 Requires(post,preun):	/sbin/chkconfig
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Requires:	rc-scripts
-#Suggests:	perl-IO-Socket-SSL
+Suggests:	spamassassin-update
+Suggests:	perl-IO-Socket-SSL
 
 %description spamd
 The purpose of this program is to provide a daemonized version of the
