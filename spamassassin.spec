@@ -1,5 +1,9 @@
 # TODO
 # - build lib{,ssl}spamc.so (if there is a point)
+# - kill "update" subpackage and move it to perl-Mail-SpamAssassin?
+#   it's `strongly recommended' in 3.2.0 (instead of `optional').
+# - is it possible to package compiled results in -compile or the result is
+#   site/machine dependant?
 #
 # Conditional build:
 %bcond_without	tests		# do not perform "make test"
@@ -7,11 +11,12 @@
 %include	/usr/lib/rpm/macros.perl
 %define		pdir	Mail
 %define		pnam	SpamAssassin
+%define		sa_version %(printf %d.%03d%03d $(echo %{version} | tr '.' ' '))
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
 Version:	3.2.0
-Release:	1
+Release:	3
 License:	Apache Software License v2
 Group:		Applications/Mail
 Source0:	http://www.apache.net.pl/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -136,6 +141,22 @@ następnie przekazuje spamdowi, odczytuje wynik i podaje go na STDOUT.
 Spamc stara się nie obciążać zbytnio procesora podczas ładowania,
 dzięki czemu powinien działać szybciej niż sam spamassassin.
 
+%package compile
+Summary:	sa-compile - compile SpamAssassin ruleset into native code
+Group:		Applications/Mail
+Requires:	gcc
+Requires:	make
+Requires:	perl(ExtUtils::MakeMaker)
+Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
+Requires:	perl-devel
+Requires:	re2c >= 0.10
+
+%description compile
+sa-compile uses "re2c" to compile the SpamAssassin ruleset. This is
+then used by the "Mail::SpamAssassin::Plugin::Rule2XSBody" plugin to
+speed up SpamAssassin's operation, where possible, and when that
+plugin is loaded.
+
 %package update
 Summary:	sa-update - automate SpamAssassin rule updates
 Summary(pl.UTF-8):	sa-update - automatyczne uaktualnianie regułek SpamAssassina
@@ -220,8 +241,8 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spam
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamd
 
-# sa-update dirs
-install -d $RPM_BUILD_ROOT/var/lib/spamassassin/$(printf %d.%03d%03d $(echo %{version} | tr '.' ' '))
+# sa-update, sa-compile dirs
+install -d $RPM_BUILD_ROOT/var/lib/spamassassin/{%{sa_version},compiled/%{sa_version}}
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/sa-update-keys
 touch $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/sa-update-keys/{pubring,secring,trustdb}.gpg
 
@@ -253,12 +274,10 @@ fi
 %defattr(644,root,root,755)
 %doc CREDITS Changes INSTALL README TRADEMARK UPGRADE USAGE
 %doc procmailrc.example
-%attr(755,root,root) %{_bindir}/sa-compile
 %attr(755,root,root) %{_bindir}/sa-learn
 %attr(755,root,root) %{_bindir}/spamassassin
 # It's needed for help of spamassassin command.
 %{perl_vendorlib}/spamassassin-run.pod
-%{_mandir}/man1/sa-compile*
 %{_mandir}/man1/sa-learn*
 %{_mandir}/man1/spamassassin*
 
@@ -279,14 +298,20 @@ fi
 %attr(755,root,root) %{_bindir}/spamc
 %{_mandir}/man1/spamc*
 
+%files compile
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/sa-compile
+%{_mandir}/man1/sa-compile*
+%dir /var/lib/spamassassin/compiled
+%dir /var/lib/spamassassin/compiled/%{sa_version}
+
 %files update
 %defattr(644,root,root,755)
 %attr(700,root,root) %dir %{_sysconfdir}/mail/spamassassin/sa-update-keys
 %attr(700,root,root) %ghost %{_sysconfdir}/mail/spamassassin/sa-update-keys/*
 %attr(755,root,root) %{_bindir}/sa-update
 %{_datadir}/spamassassin/sa-update-pubkey.txt
-%dir /var/lib/spamassassin
-%dir /var/lib/spamassassin/*
+%dir /var/lib/spamassassin/%{sa_version}
 %{_mandir}/man1/sa-update*
 
 %files -n perl-Mail-SpamAssassin
@@ -300,6 +325,8 @@ fi
 %dir %{_datadir}/spamassassin
 %config(noreplace) %{_datadir}/spamassassin/*
 %exclude %{_datadir}/spamassassin/sa-update-pubkey.txt
+
+%dir /var/lib/spamassassin
 
 %{perl_vendorlib}/Mail/*
 %{_mandir}/man3/*
