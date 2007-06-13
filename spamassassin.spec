@@ -145,7 +145,7 @@ dzięki czemu powinien działać szybciej niż sam spamassassin.
 Summary:	sa-compile - compile SpamAssassin ruleset into native code
 Group:		Applications/Mail
 Requires:	gcc
-Requires:	glibc-headers
+Requires:	glibc-devel
 Requires:	make
 Requires:	perl(ExtUtils::MakeMaker)
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
