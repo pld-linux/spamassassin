@@ -23,6 +23,8 @@ Source0:	http://www.apache.net.pl/spamassassin/source/%{pdir}-%{pnam}-%{version}
 # Source0-md5:	6840e3be132e2c3cbf66298b0227e880
 Source1:	%{name}.sysconfig
 Source2:	%{name}-spamd.init
+Source3:	%{name}-default.rc
+Source4:	%{name}-spamc.rc
 URL:		http://spamassassin.apache.org/
 BuildRequires:	openssl-devel >= 0.9.7d
 BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
@@ -71,6 +73,13 @@ look spammy, then adds headers to the message so they can be filtered
 by the user's mail reading software. This distribution includes the
 spamd/spamc components which create a server that considerably speeds
 processing of mail.
+
+To enable spamassassin, if you are receiving mail locally, simply add
+this line to your ~/.procmailrc:
+INCLUDERC=/etc/mail/spamassassin/spamassassin-default.rc
+
+To filter spam for all users, add that line to /etc/procmailrc
+(creating if necessary).
 
 %description -l pl.UTF-8
 SpamAssassin daje możliwość zredukowania, jeśli nie kompletnego
@@ -133,6 +142,13 @@ mail from STDIN, and spool it to its connection to spamd, then read
 the result back and print it to STDOUT. Spamc has extremely low
 overhead in loading, so it should be much faster to load than the
 whole spamassassin program.
+
+To enable spamassassin, if you are receiving mail locally, simply add
+this line to your ~/.procmailrc:
+INCLUDERC=/etc/mail/spamassassin/spamassassin-spamc.rc
+
+To filter spam for all users, add that line to /etc/procmailrc
+(creating if necessary).
 
 %description spamc -l pl.UTF-8
 Spamc powinien być używany zamiast "spamassassina" w skryptach
@@ -245,6 +261,8 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spam
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamd
+install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
+install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
 
 # sa-update, sa-compile
 install -d $RPM_BUILD_ROOT/var/lib/spamassassin/{%{sa_version},compiled/%{sa_version}}
@@ -280,8 +298,10 @@ fi
 %defattr(644,root,root,755)
 %doc CREDITS Changes INSTALL README TRADEMARK UPGRADE USAGE
 %doc procmailrc.example
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mail/spamassassin/spamassassin-default.rc
 %attr(755,root,root) %{_bindir}/sa-learn
 %attr(755,root,root) %{_bindir}/spamassassin
+
 # It's needed for help of spamassassin command.
 %{perl_vendorlib}/spamassassin-run.pod
 %{_mandir}/man1/sa-learn*
@@ -301,6 +321,7 @@ fi
 
 %files spamc
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mail/spamassassin/spamassassin-spamc.rc
 %attr(755,root,root) %{_bindir}/spamc
 %{_mandir}/man1/spamc*
 
