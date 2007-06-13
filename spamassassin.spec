@@ -230,6 +230,10 @@ export CFLAGS="%{rpmcflags}"
 	CC="%{__cc}" \
 	OPTIMIZE="%{rpmcflags}"
 
+%{__sed} -e "s,@@LOCAL_STATE_DIR@@,$(pwd)," sa-compile.raw > sa-compile.pl
+%{__perl} -T sa-compile.pl --siteconfigpath=rules
+rm -f compiled/%{sa_version}/auto/Mail/SpamAssassin/CompiledRegexps/body_0/.packlist
+
 %{?with_tests:%{__make} test}
 
 %install
@@ -242,10 +246,11 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spam
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamd
 
-# sa-update, sa-compile dirs
+# sa-update, sa-compile
 install -d $RPM_BUILD_ROOT/var/lib/spamassassin/{%{sa_version},compiled/%{sa_version}}
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/sa-update-keys
 touch $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/sa-update-keys/{pubring,secring,trustdb}.gpg
+cp -a compiled/%{sa_version} $RPM_BUILD_ROOT/var/lib/spamassassin/compiled
 
 rm -f $RPM_BUILD_ROOT{%{perl_archlib}/perllocal.pod,%{perl_vendorarch}/auto/Mail/SpamAssassin/.packlist,%{_mandir}/man3/spamassassin-run.*}
 
@@ -305,6 +310,19 @@ fi
 %{_mandir}/man1/sa-compile*
 %dir /var/lib/spamassassin/compiled
 %dir /var/lib/spamassassin/compiled/%{sa_version}
+
+# maybe include these in main package?
+%dir /var/lib/spamassassin/compiled/%{sa_version}/auto
+%dir /var/lib/spamassassin/compiled/%{sa_version}/auto/Mail
+%dir /var/lib/spamassassin/compiled/%{sa_version}/auto/Mail/SpamAssassin/CompiledRegexps
+%dir /var/lib/spamassassin/compiled/%{sa_version}/auto/Mail/SpamAssassin/CompiledRegexps/body_0
+%config(noreplace) %verify(not md5 mtime size) %attr(755,root,root) /var/lib/spamassassin/compiled/%{sa_version}/auto/Mail/SpamAssassin/CompiledRegexps/body_0/body_0.so
+%config(noreplace) %verify(not md5 mtime size) /var/lib/spamassassin/compiled/%{sa_version}/auto/Mail/SpamAssassin/CompiledRegexps/body_0/body_0.bs
+%dir /var/lib/spamassassin/compiled/%{sa_version}/Mail
+%dir /var/lib/spamassassin/compiled/%{sa_version}/Mail/SpamAssassin
+%dir /var/lib/spamassassin/compiled/%{sa_version}/Mail/SpamAssassin/CompiledRegexps
+%config(noreplace) %verify(not md5 mtime size) /var/lib/spamassassin/compiled/%{sa_version}/Mail/SpamAssassin/CompiledRegexps/body_0.pm
+%config(noreplace) %verify(not md5 mtime size) /var/lib/spamassassin/compiled/%{sa_version}/bases_body_0.pl
 
 %files update
 %defattr(644,root,root,755)
