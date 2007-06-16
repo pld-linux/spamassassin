@@ -95,6 +95,13 @@ filtrowanie przez oprogramowanie użytkownika. Ta dystrybucja zawiera
 programy spamd/spamc, umożliwiające uruchomienie serwera, co znacznie
 przyspieszy proces przetwarzania poczty.
 
+Aby uruchomić spamassassina dla lokalnie przychodzącej poczty,
+wystarczy dodać do własnego ~/.procmailrc linię:
+INCLUDERC=/etc/mail/spamassassin/spamassassin-default.rc
+
+Aby filtrować spam dla wszystkich użytkowników, należy dodać tę linię
+do pliku /etc/procmailrc (tworząc go w razie potrzeby).
+
 %package tools
 Summary:	Miscleanous tools for SpamAssassin
 Summary(pl.UTF-8):	Przeróżne narzędzia związane z SpamAssassin
@@ -161,8 +168,16 @@ następnie przekazuje spamdowi, odczytuje wynik i podaje go na STDOUT.
 Spamc stara się nie obciążać zbytnio procesora podczas ładowania,
 dzięki czemu powinien działać szybciej niż sam spamassassin.
 
+Aby uruchomić spamassassina dla lokalnie przychodzącej poczty,
+wystarczy dodać do własnego ~/.procmailrc linię:
+INCLUDERC=/etc/mail/spamassassin/spamassassin-spamc.rc
+
+Aby filtrować spam dla wszystkich użytkowników, należy dodać tę linię
+do pliku /etc/procmailrc (tworząc go w razie potrzeby).
+
 %package compile
 Summary:	sa-compile - compile SpamAssassin ruleset into native code
+Summary(pl.UTF-8):	sa-compile - kompilowanie reguł SpamAssasina do kodu natywnego
 Group:		Applications/Mail
 Requires:	gcc
 Requires:	glibc-devel
@@ -177,6 +192,11 @@ sa-compile uses "re2c" to compile the SpamAssassin ruleset. This is
 then used by the "Mail::SpamAssassin::Plugin::Rule2XSBody" plugin to
 speed up SpamAssassin's operation, where possible, and when that
 plugin is loaded.
+
+%description compile -l pl.UTF-8
+sa-compile wykorzystuje re2c do kompilacji reguł SpamAssassina. Służy
+to do przyspieszenia operacji SpamAssassina w miarę możliwości, kiedy
+ta wtyczka jest wczytana.
 
 %package update
 Summary:	sa-update - automate SpamAssassin rule updates
