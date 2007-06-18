@@ -359,7 +359,7 @@ fi
 %attr(700,root,root) %ghost %{_sysconfdir}/mail/spamassassin/sa-update-keys/*
 %config(noreplace) %verify(not md5 mtime size) /etc/cron.d/sa-update
 %attr(755,root,root) %{_bindir}/sa-update
-%{_datadir}/spamassassin/sa-update.cron
+%attr(755,root,root) %{_datadir}/spamassassin/sa-update.cron
 %{_datadir}/spamassassin/sa-update-pubkey.txt
 %dir /var/lib/spamassassin/%{sa_version}
 %{_mandir}/man1/sa-update*
