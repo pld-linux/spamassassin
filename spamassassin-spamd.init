@@ -28,9 +28,7 @@ if is_no "${NETWORKING}"; then
 	exit 1
 fi
 
-# See how we were called.
-case "$1" in
-  start)
+start() {
 	# Start daemon.
 	if [ ! -f /var/lock/subsys/spamd ]; then
 		msg_starting SpamAssassin
@@ -40,8 +38,9 @@ case "$1" in
 	else
 		msg_already_running SpamAssassin
 	fi
-	;;
-  stop)
+}
+
+stop() {
 	# Stop daemons.
 	if [ -f /var/lock/subsys/spamd ]; then
 		msg_stopping SpamAssassin
@@ -51,10 +50,19 @@ case "$1" in
 	else
 		msg_not_running SpamAssassin
 	fi
+}
+
+# See how we were called.
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+  	stop
 	;;
   restart)
-	$0 stop
-	$0 start
+	stop
+	start
 	;;
   status)
 	status spamd
