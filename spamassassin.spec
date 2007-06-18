@@ -66,7 +66,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(DBI)' 'perl(Net::Ident)'
 
 %description
-SpamAssassin provides you with a way to reduce if not completely
+Apache SpamAssassin provides you with a way to reduce if not completely
 eliminate Unsolicited Commercial Email (SPAM) from your incoming
 email. It can be invoked by a MDA such as sendmail or postfix, or can
 be called from a procmail script, .forward file, etc. It uses a
@@ -84,7 +84,7 @@ To filter spam for all users, add that line to /etc/procmailrc
 (creating if necessary).
 
 %description -l pl.UTF-8
-SpamAssassin daje możliwość zredukowania, jeśli nie kompletnego
+Apache SpamAssassin daje możliwość zredukowania, jeśli nie kompletnego
 wyeliminowania niezamawianej komercyjnej poczty (Unsolicited
 Commercial Email, spamu) z poczty. Może być wywoływany z MDA, np.
 Sendmaila czy Postfiksa, lub z pliku ~/.forward itp. Używa ogólnego
