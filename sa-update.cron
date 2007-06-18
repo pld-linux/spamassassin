@@ -1,8 +1,0 @@
-### OPTIONAL: Spamassassin Rules Updates ###
-#
-# http://wiki.apache.org/spamassassin/RuleUpdates
-# Highly recommended that you read the documentation before using this.
-# ENABLE UPDATES AT YOUR OWN RISK.
-#
-
-#10 4 * * * root /usr/share/spamassassin/sa-update.cron
