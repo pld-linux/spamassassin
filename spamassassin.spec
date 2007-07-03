@@ -1,9 +1,5 @@
 # TODO
 # - build lib{,ssl}spamc.so (if there is a point)
-# - kill "update" subpackage and move it to perl-Mail-SpamAssassin?
-#   it's `strongly recommended' in 3.2.0 (instead of `optional').
-# - is it possible to package compiled results in -compile or the result is
-#   site/machine dependant?
 #
 # Conditional build:
 %bcond_without	tests		# do not perform "make test"
@@ -16,7 +12,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
 Version:	3.2.1
-Release:	1
+Release:	4
 License:	Apache Software License v2
 Group:		Applications/Mail
 Source0:	http://www.apache.net.pl/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -25,6 +21,8 @@ Source1:	%{name}.sysconfig
 Source2:	%{name}-spamd.init
 Source3:	%{name}-default.rc
 Source4:	%{name}-spamc.rc
+Source5:	sa-update.sh
+Source6:	sa-update.cron
 URL:		http://spamassassin.apache.org/
 BuildRequires:	openssl-devel >= 0.9.7d
 BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
@@ -60,14 +58,13 @@ BUildRequires:	perl-Compress-Zlib
 BuildRequires:	rpm-perlprov >= 4.1-13
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Obsoletes:	SpamAssassin
-Suggests:	spamassassin-update
-Suggests:	spamassassin-compile
+Obsoletes:	spamassassin-tools
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(DBI)' 'perl(Net::Ident)'
 
 %description
-SpamAssassin provides you with a way to reduce if not completely
+Apache SpamAssassin provides you with a way to reduce if not completely
 eliminate Unsolicited Commercial Email (SPAM) from your incoming
 email. It can be invoked by a MDA such as sendmail or postfix, or can
 be called from a procmail script, .forward file, etc. It uses a
@@ -85,7 +82,7 @@ To filter spam for all users, add that line to /etc/procmailrc
 (creating if necessary).
 
 %description -l pl.UTF-8
-SpamAssassin daje możliwość zredukowania, jeśli nie kompletnego
+Apache SpamAssassin daje możliwość zredukowania, jeśli nie kompletnego
 wyeliminowania niezamawianej komercyjnej poczty (Unsolicited
 Commercial Email, spamu) z poczty. Może być wywoływany z MDA, np.
 Sendmaila czy Postfiksa, lub z pliku ~/.forward itp. Używa ogólnego
@@ -102,20 +99,6 @@ INCLUDERC=/etc/mail/spamassassin/spamassassin-default.rc
 Aby filtrować spam dla wszystkich użytkowników, należy dodać tę linię
 do pliku /etc/procmailrc (tworząc go w razie potrzeby).
 
-%package tools
-Summary:	Miscleanous tools for SpamAssassin
-Summary(pl.UTF-8):	Przeróżne narzędzia związane z SpamAssassin
-Group:		Applications/Mail
-Obsoletes:	SpamAssassin-tools
-
-%description tools
-Miscleanous tools from various authors, distributed with SpamAssassin.
-See /usr/share/doc/spamassassin-tools-*/.
-
-%description tools -l pl.UTF-8
-Przeróżne narzędzia, dystrybuowane razem ze SpamAssassinem. Więcej
-informacji w /usr/share/doc/spamassassin-tools-*/.
-
 %package spamd
 Summary:	spamd - daemonized version of spamassassin
 Summary(pl.UTF-8):	spamd - spamassassin w postaci demona
@@ -123,8 +106,6 @@ Group:		Applications/Mail
 Requires(post,preun):	/sbin/chkconfig
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Requires:	rc-scripts
-Suggests:	spamassassin-update
-Suggests:	perl-IO-Socket-SSL
 
 %description spamd
 The purpose of this program is to provide a daemonized version of the
@@ -278,7 +259,7 @@ rm -f compiled/%{sa_version}/auto/Mail/SpamAssassin/CompiledRegexps/body_0/.pack
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spamassassin}
+install -d $RPM_BUILD_ROOT{/etc/{cron.d,sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spamassassin}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -287,6 +268,8 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamd
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
 install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
+install %{SOURCE5} $RPM_BUILD_ROOT%{_datadir}/spamassassin/sa-update.cron
+install %{SOURCE6} $RPM_BUILD_ROOT/etc/cron.d/sa-update
 
 # sa-update, sa-compile
 install -d $RPM_BUILD_ROOT/var/lib/spamassassin/{%{sa_version},compiled/%{sa_version}}
@@ -321,7 +304,7 @@ fi
 %files
 %defattr(644,root,root,755)
 %doc CREDITS Changes INSTALL README TRADEMARK UPGRADE USAGE
-%doc procmailrc.example
+%doc procmailrc.example sql/ ldap/
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mail/spamassassin/spamassassin-default.rc
 %attr(755,root,root) %{_bindir}/sa-learn
 %attr(755,root,root) %{_bindir}/spamassassin
@@ -330,10 +313,6 @@ fi
 %{perl_vendorlib}/spamassassin-run.pod
 %{_mandir}/man1/sa-learn*
 %{_mandir}/man1/spamassassin*
-
-%files tools
-%defattr(644,root,root,755)
-%doc sql ldap
 
 %files spamd
 %defattr(644,root,root,755)
@@ -359,6 +338,7 @@ fi
 # maybe include these in main package?
 %dir /var/lib/spamassassin/compiled/%{sa_version}/auto
 %dir /var/lib/spamassassin/compiled/%{sa_version}/auto/Mail
+%dir /var/lib/spamassassin/compiled/%{sa_version}/auto/Mail/SpamAssassin
 %dir /var/lib/spamassassin/compiled/%{sa_version}/auto/Mail/SpamAssassin/CompiledRegexps
 %dir /var/lib/spamassassin/compiled/%{sa_version}/auto/Mail/SpamAssassin/CompiledRegexps/body_0
 %config(noreplace) %verify(not md5 mtime size) %attr(755,root,root) /var/lib/spamassassin/compiled/%{sa_version}/auto/Mail/SpamAssassin/CompiledRegexps/body_0/body_0.so
@@ -373,7 +353,9 @@ fi
 %defattr(644,root,root,755)
 %attr(700,root,root) %dir %{_sysconfdir}/mail/spamassassin/sa-update-keys
 %attr(700,root,root) %ghost %{_sysconfdir}/mail/spamassassin/sa-update-keys/*
+%config(noreplace) %verify(not md5 mtime size) /etc/cron.d/sa-update
 %attr(755,root,root) %{_bindir}/sa-update
+%attr(755,root,root) %{_datadir}/spamassassin/sa-update.cron
 %{_datadir}/spamassassin/sa-update-pubkey.txt
 %dir /var/lib/spamassassin/%{sa_version}
 %{_mandir}/man1/sa-update*
