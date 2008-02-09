@@ -13,7 +13,7 @@ Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczający
 Name:		spamassassin
 Version:	3.2.4
 Release:	2
-License:	Apache Software License v2
+License:	Apache v2.0
 Group:		Applications/Mail
 Source0:	http://www.apache.net.pl/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
 # Source0-md5:	2081c24c8b9064f9dd220e4f41e1d299
