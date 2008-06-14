@@ -11,12 +11,12 @@
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
-Version:	3.2.4
-Release:	2
+Version:	3.2.5
+Release:	1
 License:	Apache v2.0
 Group:		Applications/Mail
 Source0:	http://www.apache.net.pl/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
-# Source0-md5:	2081c24c8b9064f9dd220e4f41e1d299
+# Source0-md5:	695f9107b240383e48df8938f2de334e
 Source1:	%{name}.sysconfig
 Source2:	%{name}-spamd.init
 Source3:	%{name}-default.rc
@@ -279,7 +279,7 @@ install %{SOURCE6} $RPM_BUILD_ROOT/etc/cron.d/sa-update
 install -d $RPM_BUILD_ROOT/var/lib/spamassassin/{%{sa_version},compiled/%{sa_version}}
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/sa-update-keys
 touch $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/sa-update-keys/{pubring,secring,trustdb}.gpg
-cp -a compiled/%{sa_version} $RPM_BUILD_ROOT/var/lib/spamassassin/compiled
+cp -a compiled/*/%{sa_version} $RPM_BUILD_ROOT/var/lib/spamassassin/compiled
 
 rm -f $RPM_BUILD_ROOT{%{perl_archlib}/perllocal.pod,%{perl_vendorarch}/auto/Mail/SpamAssassin/.packlist,%{_mandir}/man3/spamassassin-run.*}
 
