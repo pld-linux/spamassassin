@@ -59,8 +59,6 @@ BuildRequires:	rpm-perlprov >= 4.1-13
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Obsoletes:	SpamAssassin
 Obsoletes:	spamassassin-tools
-Suggests:	spamassassin-compile
-Suggests:	spamassassin-update
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(DBI)' 'perl(Net::Ident)'
@@ -108,8 +106,9 @@ Group:		Applications/Mail
 Requires(post,preun):	/sbin/chkconfig
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Requires:	rc-scripts
+Suggests:	perl-Apache-Test
 Suggests:	perl-IO-Socket-SSL
-Suggests:	spamassassin-update
+Suggests:	perl-Net-Ident
 
 %description spamd
 The purpose of this program is to provide a daemonized version of the
@@ -130,6 +129,7 @@ wydajnym programem klienckim.
 Summary:	spamc - client for spamd
 Summary(pl.UTF-8):	spamc - klient dla spamd
 Group:		Applications/Mail
+Suggests:	perl-Compress-Zlib
 
 %description spamc
 Spamc is the client half of the spamc/spamd pair. It should be used in
@@ -214,11 +214,23 @@ podpisów GPG.
 Summary:	Mail::SpamAssassin - SpamAssassin e-mail filter libraries
 Summary(pl.UTF-8):	Mail::SpamAssassin - biblioteki filtra poczty SpamAssassin
 Group:		Development/Languages/Perl
-Requires:	perl-Cache-DB_File >= 0.2
 Requires:	perl-HTML-Parser >= 3
-Requires:	perl-IO-Socket-INET6 >= 2.51
-Requires:	perl-Mail-SPF-Query
-Requires:	perl-Sys-Hostname-Long
+# what for this one?
+#Requires:	perl-Sys-Hostname-Long
+Suggests:	perl-Cache-DB_File >= 0.2
+Suggests:	perl-DBD-mysql
+Suggests:	perl-Encode-Detect
+Suggests:	perl-IO-Socket-INET6 >= 2.51
+Suggests:	perl-IP-Country
+Suggests:	perl-Mail-DKIM
+#Suggests:	perl-Mail-DomainKeys
+#Suggests:	perl-Mail-SPF
+Suggests:	perl-Mail-SPF-Query
+Suggests:	perl-Net-DNS >= 0.34
+Suggests:	Razor
+Suggests:	spamassassin-compile
+Suggests:	spamassassin-plugin-fuzzyocr
+Suggests:	spamassassin-update
 
 %description -n perl-Mail-SpamAssassin
 Mail::SpamAssassin is a Mail::Audit plugin to identify spam using text
