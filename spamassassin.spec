@@ -59,6 +59,8 @@ BuildRequires:	rpm-perlprov >= 4.1-13
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Obsoletes:	SpamAssassin
 Obsoletes:	spamassassin-tools
+Suggests:	spamassassin-compile
+Suggests:	spamassassin-update
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(DBI)' 'perl(Net::Ident)'
@@ -107,6 +109,7 @@ Requires(post,preun):	/sbin/chkconfig
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Requires:	rc-scripts
 Suggests:	perl-IO-Socket-SSL
+Suggests:	spamassassin-update
 
 %description spamd
 The purpose of this program is to provide a daemonized version of the
