@@ -55,7 +55,7 @@ BuildRequires:	perl-Mail-DomainKeys
 BuildRequires:	perl-Mail-SPF
 BuildRequires:	perl-MailTools
 BuildRequires:	perl-Razor > 2.61
-BUildRequires:	perl-Compress-Zlib
+BuildRequires:	perl-Compress-Zlib
 %endif
 BuildRequires:	rpm-perlprov >= 4.1-13
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
