@@ -39,13 +39,12 @@ BuildRequires:	perl-IO-Socket-SSL
 BuildRequires:	perl-IO-Zlib
 BuildRequires:	perl-IP-Country
 BuildRequires:	perl-Mail-SPF-Query
-BuildRequires:	perl-Net-DNS >= 0.34
+BuildRequires:	perl-Net-DNS >= 0.65-3
 BuildRequires:	perl-Net-Ident
 #BuildRequires:	perl-Razor2
 BuildRequires:	perl-devel >= 1:5.8.0
 BuildRequires:	perl-libwww
 BuildRequires:	re2c
-BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.453
 %if %{with tests}
@@ -257,9 +256,7 @@ aplikacji do czytania poczty.
 %setup -q -n %{pdir}-%{pnam}-%{version}
 dos2unix rules/72_active.cf
 %patch0 -p1
-%if "%{pld_release}" != "ac"
 %patch1 -p1
-%endif
 
 %build
 # for spamc/configure
