@@ -45,9 +45,12 @@ BuildRequires:	perl-Net-Ident
 BuildRequires:	perl-devel >= 1:5.8.0
 BuildRequires:	perl-libwww
 BuildRequires:	re2c
-BuildRequires:	rpmbuild(macros) >= 1.310
+BuildRequires:	rpm >= 4.4.9-56
+BuildRequires:	rpm-perlprov >= 4.1-13
+BuildRequires:	rpmbuild(macros) >= 1.453
 %if %{with tests}
 # are these really needed?
+BuildRequires:	perl-Compress-Zlib
 BuildRequires:	perl-Encode-Detect
 BuildRequires:	perl-MIME-Base64
 BuildRequires:	perl-MIME-tools
@@ -56,9 +59,7 @@ BuildRequires:	perl-Mail-DomainKeys
 BuildRequires:	perl-Mail-SPF
 BuildRequires:	perl-MailTools
 BuildRequires:	perl-Razor > 2.61
-BuildRequires:	perl-Compress-Zlib
 %endif
-BuildRequires:	rpm-perlprov >= 4.1-13
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Obsoletes:	SpamAssassin
 Obsoletes:	spamassassin-tools
@@ -67,15 +68,15 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(DBI)' 'perl(Net::Ident)'
 
 %description
-Apache SpamAssassin provides you with a way to reduce if not completely
-eliminate Unsolicited Commercial Email (SPAM) from your incoming
-email. It can be invoked by a MDA such as sendmail or postfix, or can
-be called from a procmail script, .forward file, etc. It uses a
-genetic-algorithm evolved scoring system to identify messages which
-look spammy, then adds headers to the message so they can be filtered
-by the user's mail reading software. This distribution includes the
-spamd/spamc components which create a server that considerably speeds
-processing of mail.
+Apache SpamAssassin provides you with a way to reduce if not
+completely eliminate Unsolicited Commercial Email (SPAM) from your
+incoming email. It can be invoked by a MDA such as sendmail or
+postfix, or can be called from a procmail script, .forward file, etc.
+It uses a genetic-algorithm evolved scoring system to identify
+messages which look spammy, then adds headers to the message so they
+can be filtered by the user's mail reading software. This distribution
+includes the spamd/spamc components which create a server that
+considerably speeds processing of mail.
 
 To enable spamassassin, if you are receiving mail locally, simply add
 this line to your ~/.procmailrc:
@@ -220,6 +221,7 @@ Group:		Development/Languages/Perl
 Requires:	perl-HTML-Parser >= 3
 # what for this one?
 #Requires:	perl-Sys-Hostname-Long
+Suggests:	Razor
 Suggests:	perl-Cache-DB_File >= 0.2
 Suggests:	perl-DBD-mysql
 Suggests:	perl-Encode-Detect
@@ -230,7 +232,6 @@ Suggests:	perl-Mail-DKIM
 #Suggests:	perl-Mail-SPF
 Suggests:	perl-Mail-SPF-Query
 Suggests:	perl-Net-DNS >= 0.34
-Suggests:	Razor
 Suggests:	spamassassin-compile
 Suggests:	spamassassin-plugin-fuzzyocr
 Suggests:	spamassassin-update
@@ -256,7 +257,9 @@ aplikacji do czytania poczty.
 %setup -q -n %{pdir}-%{pnam}-%{version}
 dos2unix rules/72_active.cf
 %patch0 -p1
+%if "%{pld_release}" != "ac"
 %patch1 -p1
+%endif
 
 %build
 # for spamc/configure
