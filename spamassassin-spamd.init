@@ -36,7 +36,7 @@ start() {
 	fi
 
 	msg_starting "SpamAssassin"
-	daemon /usr/sbin/spamd $SPAMD_OPTS
+	daemon /usr/bin/spamd $SPAMD_OPTS
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/spamd
 }
