@@ -24,32 +24,34 @@ fi
 
 # Check that networking is up.
 if is_no "${NETWORKING}"; then
-	msg_network_down SpamAssassin
+	msg_network_down "SpamAssassin"
 	exit 1
 fi
 
 start() {
 	# Start daemon.
-	if [ ! -f /var/lock/subsys/spamd ]; then
-		msg_starting SpamAssassin
-		daemon spamd $SPAMD_OPTS
-		RETVAL=$?
-		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/spamd
-	else
-		msg_already_running SpamAssassin
+	if [ -f /var/lock/subsys/spamd ]; then
+		msg_already_running "SpamAssassin"
+		return
 	fi
+
+	msg_starting "SpamAssassin"
+	daemon /usr/sbin/spamd $SPAMD_OPTS
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/spamd
 }
 
 stop() {
 	# Stop daemons.
-	if [ -f /var/lock/subsys/spamd ]; then
-		msg_stopping SpamAssassin
-		killproc spamd
-		RETVAL=$?
-		rm -f /var/lock/subsys/spamd
-	else
-		msg_not_running SpamAssassin
+	if [ ! -f /var/lock/subsys/spamd ]; then
+		msg_not_running "SpamAssassin"
+		return
 	fi
+
+	msg_stopping "SpamAssassin"
+	killproc spamd
+	RETVAL=$?
+	rm -f /var/lock/subsys/spamd
 }
 
 # See how we were called.
