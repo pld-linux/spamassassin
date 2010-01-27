@@ -1,6 +1,6 @@
 # TODO
 # - build lib{,ssl}spamc.so (if there is a point)
-# - sa-check_spamd into nagios-spamassassin subpackage
+# - sa-check_spamd into nagios-plugin-check_spamd subpackage
 #
 # Conditional build:
 %bcond_without	tests		# do not perform "make test"
