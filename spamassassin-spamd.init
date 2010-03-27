@@ -35,6 +35,12 @@ start() {
 		return
 	fi
 
+	# Check if database is installed.
+	if [ $(find /var/lib/spamassassin/ -name '*.cf' | wc -l) -gt 0 ]; then
+		show 'Spamassassin database not found. Run sa-update first.' && fail
+		return 1
+	fi
+
 	msg_starting "SpamAssassin"
 	daemon /usr/bin/spamd $SPAMD_OPTS
 	RETVAL=$?
