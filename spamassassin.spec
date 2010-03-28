@@ -333,8 +333,9 @@ fi
 
 # It's needed for help of spamassassin command.
 %{perl_vendorlib}/spamassassin-run.pod
-%{_mandir}/man1/sa-learn*
-%{_mandir}/man1/spamassassin*
+%{_mandir}/man1/sa-learn.1*
+%{_mandir}/man1/spamassassin.1*
+%{_mandir}/man1/spamassassin-run.1*
 
 %files spamd
 %defattr(644,root,root,755)
@@ -342,18 +343,18 @@ fi
 %attr(754,root,root) /etc/rc.d/init.d/spamd
 %attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/spamd
 %attr(755,root,root) %{_bindir}/spamd
-%{_mandir}/man1/spamd*
+%{_mandir}/man1/spamd.1*
 
 %files spamc
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mail/spamassassin/spamassassin-spamc.rc
 %attr(755,root,root) %{_bindir}/spamc
-%{_mandir}/man1/spamc*
+%{_mandir}/man1/spamc.1*
 
 %files compile
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/sa-compile
-%{_mandir}/man1/sa-compile*
+%{_mandir}/man1/sa-compile.1*
 %dir /var/lib/spamassassin/compiled
 %dir /var/lib/spamassassin/compiled/%{sa_version}
 
@@ -367,7 +368,7 @@ fi
 %attr(755,root,root) %{_datadir}/spamassassin/sa-update.cron
 %{_datadir}/spamassassin/sa-update-pubkey.txt
 %dir /var/lib/spamassassin/%{sa_version}
-%{_mandir}/man1/sa-update*
+%{_mandir}/man1/sa-update.1*
 
 %files -n perl-Mail-SpamAssassin
 %defattr(644,root,root,755)
@@ -384,4 +385,4 @@ fi
 %dir /var/lib/spamassassin
 
 %{perl_vendorlib}/Mail/*
-%{_mandir}/man3/*
+%{_mandir}/man3/*.3*
