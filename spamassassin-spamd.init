@@ -36,8 +36,8 @@ start() {
 	fi
 
 	# Check if database is installed.
-	if [ $(find /var/lib/spamassassin/ -name '*.cf' | wc -l) == 0 ]; then
-		show 'Spamassassin database not found. Run sa-update first.' && fail
+	if [ "$(find /var/lib/spamassassin/ -name '*.cf' | wc -l)" == 0 ]; then
+		show 'Spamassassin database not found. Run sa-update first.'; fail
 		return 1
 	fi
 
