@@ -1,5 +1,6 @@
 #!/bin/sh
 
+umask 022
 OPT=""
 
 [ -f /etc/mail/spamassassin/channels ] && OPT="$OPT --channelfile /etc/mail/spamassassin/channels"
