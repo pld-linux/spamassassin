@@ -5,7 +5,6 @@ OPT=""
 
 [ -f /etc/mail/spamassassin/channels ] && OPT="$OPT --channelfile /etc/mail/spamassassin/channels"
 
-sleep $(expr $RANDOM % 7200)
 # Only restart spamd if sa-update returns 0, meaning it updated the rules
 /usr/bin/sa-update $OPT || exit $?
 
