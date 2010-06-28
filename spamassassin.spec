@@ -39,6 +39,7 @@ BuildRequires:	perl-IP-Country
 BuildRequires:	perl-Mail-SPF-Query
 BuildRequires:	perl-Net-DNS >= 0.65-3
 BuildRequires:	perl-Net-Ident
+BuildRequires:	perl-NetAddr-IP >= 4.000
 #BuildRequires:	perl-Razor2
 BuildRequires:	perl-devel >= 1:5.8.0
 BuildRequires:	perl-libwww
