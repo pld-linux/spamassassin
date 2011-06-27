@@ -12,20 +12,18 @@
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
-Version:	3.3.1
-Release:	5
+Version:	3.3.2
+Release:	1
 License:	Apache v2.0
 Group:		Applications/Mail
 Source0:	http://ftp.tpnet.pl/vol/d1/apache/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
-# Source0-md5:	bb977900c3b2627db13e9f44f9b5bfc8
+# Source0-md5:	253f8fcbeb6c8bfcab9d139865c1a404
 Source1:	%{name}.sysconfig
 Source2:	%{name}-spamd.init
 Source3:	%{name}-default.rc
 Source4:	%{name}-spamc.rc
 Source5:	sa-update.sh
 Source6:	sa-update.cron
-Patch0:		%{name}-perl_5_12.patch
-Patch1:		%{name}-uninitialized_value.patch
 URL:		http://spamassassin.apache.org/
 BuildRequires:	openssl-devel >= 1.0.0
 BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
@@ -255,8 +253,6 @@ aplikacji do czytania poczty.
 
 %prep
 %setup -q -n %{pdir}-%{pnam}-%{version}
-%patch0 -p1
-%patch1 -p1
 
 %build
 # for spamc/configure
@@ -335,12 +331,14 @@ fi
 %attr(755,root,root) %{_bindir}/sa-learn
 %attr(755,root,root) %{_bindir}/sa-awl
 %attr(755,root,root) %{_bindir}/spamassassin
+%attr(755,root,root) %{_bindir}/sa-check_spamd
 
 # It's needed for help of spamassassin command.
 %{perl_vendorlib}/spamassassin-run.pod
 %{_mandir}/man1/sa-learn.1*
 %{_mandir}/man1/spamassassin.1*
 %{_mandir}/man1/spamassassin-run.1*
+%{_mandir}/man1/sa-awl.1*
 
 %files spamd
 %defattr(644,root,root,755)
