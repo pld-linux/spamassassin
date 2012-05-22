@@ -25,7 +25,7 @@ Source4:	%{name}-spamc.rc
 Source5:	sa-update.sh
 Source6:	sa-update.cron
 URL:		http://spamassassin.apache.org/
-BuildRequires:	openssl-devel
+BuildRequires:	openssl-devel >= 1.0.0
 BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
 BuildRequires:	perl-Archive-Tar
 BuildRequires:	perl-DBI
