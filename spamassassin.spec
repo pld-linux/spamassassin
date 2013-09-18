@@ -13,7 +13,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
 Version:	3.3.2
-Release:	3
+Release:	4
 License:	Apache v2.0
 Group:		Applications/Mail
 Source0:	http://ftp.tpnet.pl/vol/d1/apache/spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -24,6 +24,7 @@ Source3:	%{name}-default.rc
 Source4:	%{name}-spamc.rc
 Source5:	sa-update.sh
 Source6:	sa-update.cron
+Patch0:		%{name}-perl_5.18.patch
 URL:		http://spamassassin.apache.org/
 BuildRequires:	openssl-devel >= 0.9.7d
 BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
@@ -48,7 +49,7 @@ BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.453
 %if %{with tests}
 # are these really needed?
-BuildRequires:	perl-Compress-Zlib
+#BuildRequires:	perl-Compress-Zlib
 BuildRequires:	perl-Encode-Detect
 BuildRequires:	perl-MIME-Base64
 BuildRequires:	perl-MIME-tools
@@ -253,6 +254,7 @@ aplikacji do czytania poczty.
 
 %prep
 %setup -q -n %{pdir}-%{pnam}-%{version}
+%patch0 -p1
 
 %build
 # for spamc/configure
@@ -380,9 +382,9 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mail/spamassassin/*.pre
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mail/spamassassin/*.cf
 %exclude %{_sysconfdir}/mail/spamassassin/sa-update-keys
-
 %dir %{_datadir}/spamassassin
-%config(noreplace) %{_datadir}/spamassassin/*
+%config(noreplace) %{_datadir}/spamassassin/languages
+%config(noreplace) %{_datadir}/spamassassin/user_prefs.template
 %exclude %{_datadir}/spamassassin/sa-update-pubkey.txt
 
 %dir /var/lib/spamassassin
