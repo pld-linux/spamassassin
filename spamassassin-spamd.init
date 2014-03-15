@@ -55,7 +55,7 @@ stop() {
 	fi
 
 	msg_stopping "SpamAssassin"
-	killproc spamd
+	killproc --pidfile spamassassin.pid spamd
 	RETVAL=$?
 	rm -f /var/lock/subsys/spamd
 }
