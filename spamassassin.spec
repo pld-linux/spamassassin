@@ -4,16 +4,16 @@
 #
 # Conditional build:
 %bcond_without	tests		# do not perform "make test"
-#
-%include	/usr/lib/rpm/macros.perl
+
 %define		pdir	Mail
 %define		pnam	SpamAssassin
 %define		sa_version %(printf %d.%03d%03d $(echo %{version} | tr '.' ' '))
+%include	/usr/lib/rpm/macros.perl
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
 Version:	3.4.0
-Release:	2
+Release:	3
 License:	Apache v2.0
 Group:		Applications/Mail
 Source0:	http://ftp.ps.pl/pub/apache//spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -109,8 +109,8 @@ Requires(post,preun):	/sbin/chkconfig
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Requires:	rc-scripts
 Suggests:	perl-Apache-Test
-Suggests:	perl-IO-Socket-SSL
 Suggests:	perl-IO-Socket-IP
+Suggests:	perl-IO-Socket-SSL
 Suggests:	perl-Net-Ident
 
 %description spamd
@@ -190,6 +190,7 @@ ta wtyczka jest wczytana.
 Summary:	sa-update - automate SpamAssassin rule updates
 Summary(pl.UTF-8):	sa-update - automatyczne uaktualnianie regułek SpamAssassina
 Group:		Applications/Mail
+Requires:	crondaemon
 Requires:	gnupg
 Requires:	perl-Archive-Tar
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
