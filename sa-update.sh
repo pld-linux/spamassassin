@@ -30,7 +30,8 @@ for file in /etc/mail/spamassassin/channel.d/*.conf; do
     sa-update --import "$file"
 done
 
-[ -f /etc/mail/spamassassin/channels ] && OPT="$OPT --channelfile /etc/mail/spamassassin/channels"
+# Using --channelfile breaks channel.d support :-/ Need better way but stays for now for backward compat
+grep -q "^[a-zA-Z0-9]" /etc/mail/spamassassin/channels && OPT="$OPT --channelfile /etc/mail/spamassassin/channels"
 
 # Run sa-update on each channel, restart spam daemon if success
 for channel in $CHANNELLIST; do
