@@ -13,7 +13,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
 Version:	3.4.0
-Release:	3
+Release:	4
 License:	Apache v2.0
 Group:		Applications/Mail
 Source0:	http://ftp.ps.pl/pub/apache//spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -24,6 +24,8 @@ Source3:	%{name}-default.rc
 Source4:	%{name}-spamc.rc
 Source5:	sa-update.sh
 Source6:	sa-update.cron
+Source7:	spamassassin-official.conf
+Source8:	sought.conf
 URL:		http://spamassassin.apache.org/
 BuildRequires:	openssl-devel >= 0.9.7d
 BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
@@ -111,6 +113,7 @@ Requires:	rc-scripts
 Suggests:	perl-Apache-Test
 Suggests:	perl-IO-Socket-IP
 Suggests:	perl-IO-Socket-SSL
+Suggests:	perl-IO-Socket-INET6
 Suggests:	perl-Net-Ident
 
 %description spamd
@@ -225,6 +228,7 @@ Suggests:	Razor
 Suggests:	perl-Cache-DB_File >= 0.2
 Suggests:	perl-DBD-mysql
 Suggests:	perl-Encode-Detect
+Suggests:	perl-Geo-IP
 Suggests:	perl-IO-Socket-INET6 >= 2.51
 Suggests:	perl-IP-Country
 Suggests:	perl-Mail-DKIM
@@ -232,6 +236,7 @@ Suggests:	perl-Mail-DKIM
 #Suggests:	perl-Mail-SPF
 Suggests:	perl-Mail-SPF-Query
 Suggests:	perl-Net-DNS >= 0.34
+Suggests:	perl-Net-Patricia
 Suggests:	spamassassin-compile
 Suggests:	spamassassin-plugin-fuzzyocr
 Suggests:	spamassassin-update
@@ -278,7 +283,7 @@ export CFLAGS="%{rpmcflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/{cron.d,sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spamassassin}
+install -d $RPM_BUILD_ROOT{/etc/{cron.d,sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spamassassin/channel.d}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -289,6 +294,8 @@ install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
 install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
 install %{SOURCE5} $RPM_BUILD_ROOT%{_datadir}/spamassassin/sa-update.cron
 install %{SOURCE6} $RPM_BUILD_ROOT/etc/cron.d/sa-update
+install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/channel.d
+install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/channel.d
 
 # sa-update, sa-compile
 install -d $RPM_BUILD_ROOT/var/lib/spamassassin/{%{sa_version},compiled/%{sa_version}}
@@ -298,9 +305,7 @@ touch $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/sa-update-keys/{pubring,se
 rm -f $RPM_BUILD_ROOT{%{perl_archlib}/perllocal.pod,%{perl_vendorarch}/auto/Mail/SpamAssassin/.packlist,%{_mandir}/man3/spamassassin-run.*}
 
 cat > $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/channels << 'EOF'
-updates.spamassassin.org
-# http://saupdates.openprotect.com/
-# saupdates.openprotect.com
+# Use %{_sysconfdir}/mail/spamassassin/channel.d/*.conf for new channels
 EOF
 
 %clean
@@ -366,6 +371,9 @@ fi
 %files update
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mail/spamassassin/channels
+%dir %{_sysconfdir}/mail/spamassassin/channel.d
+%{_sysconfdir}/mail/spamassassin/channel.d/spamassassin-official.conf
+%{_sysconfdir}/mail/spamassassin/channel.d/sought.conf
 %attr(700,root,root) %dir %{_sysconfdir}/mail/spamassassin/sa-update-keys
 %attr(700,root,root) %ghost %{_sysconfdir}/mail/spamassassin/sa-update-keys/*
 %config(noreplace) %verify(not md5 mtime size) /etc/cron.d/sa-update
