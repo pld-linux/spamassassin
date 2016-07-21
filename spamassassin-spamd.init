@@ -8,7 +8,7 @@
 #              email messages for SPAM.  It is normally called by spamc \
 #              from a MDA.
 # processname: spamd
-# pidfile:     /var/run/spamassassin.pid
+# pidfile:     /var/run/spamd.pid
 
 # Source function library.
 . /etc/rc.d/init.d/functions
@@ -42,7 +42,7 @@ start() {
 	fi
 
 	msg_starting "SpamAssassin"
-	daemon /usr/bin/spamd -r /var/run/spamassassin.pid $SPAMD_OPTS
+	daemon /usr/bin/spamd -r /var/run/spamd.pid $SPAMD_OPTS
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/spamd
 }
@@ -55,7 +55,7 @@ stop() {
 	fi
 
 	msg_stopping "SpamAssassin"
-	killproc --pidfile spamassassin.pid spamd
+	killproc --pidfile spamd.pid spamd
 	RETVAL=$?
 	rm -f /var/lock/subsys/spamd
 }
@@ -90,7 +90,7 @@ case "$1" in
 	condrestart 7
 	;;
   status)
-	status spamd
+	status --pidfile spamd.pid spamd
 	;;
   *)
 	msg_usage "$0 {start|stop|restart|try-restart|force-reload|status}"
