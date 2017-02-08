@@ -1,12 +1,396 @@
-diff -Nur Mail-SpamAssassin-3.4.1.orig/lib/Mail/SpamAssassin/DnsResolver.pm Mail-SpamAssassin-3.4.1/lib/Mail/SpamAssassin/DnsResolver.pm
---- Mail-SpamAssassin-3.4.1.orig/lib/Mail/SpamAssassin/DnsResolver.pm	2015-04-28 13:56:49.000000000 -0600
-+++ Mail-SpamAssassin-3.4.1/lib/Mail/SpamAssassin/DnsResolver.pm	2016-06-11 13:55:15.380517343 -0600
-@@ -592,6 +592,8 @@
+commit e064e2844aede6026433fa9635d4181b3de396aa
+Author: Mark Martinec <mmartinec@apache.org>
+Date:   Mon Jul 20 18:23:18 2015 +0000
+
+    Bug 7223: Net::DNS 1.01 breaks DnsResolver
+    
+    git-svn-id: https://svn.apache.org/repos/asf/spamassassin/trunk@1691991 13f79535-47bb-0310-9956-ffa450edef68
+
+diff --git a/lib/Mail/SpamAssassin/DnsResolver.pm b/lib/Mail/SpamAssassin/DnsResolver.pm
+index ce51bee83..612245cac 100644
+--- a/lib/Mail/SpamAssassin/DnsResolver.pm
++++ b/lib/Mail/SpamAssassin/DnsResolver.pm
+@@ -581,7 +581,7 @@ sub new_dns_packet {
+     #    time, $domain, $type, $packet->id);
+     1;
+   } or do {
+-    # this can if a domain name in a query is invalid, or if a timeout signal
++    # get here if a domain name in a query is invalid, or if a timeout signal
+     # happened to be trapped by this eval, or if Net::DNS signalled an error
+     my $eval_stat = $@ ne '' ? $@ : "errno=$!";  chomp $eval_stat;
+     # resignal if alarm went off
+@@ -592,6 +592,9 @@ sub new_dns_packet {
    };
  
    if ($packet) {
 +    # RD flag needs to be set explicitly since Net::DNS 1.01, Bug 7223	
 +    $packet->header->rd(1);
++
    # my $udp_payload_size = $self->{res}->udppacketsize;
      my $udp_payload_size = $self->{conf}->{dns_options}->{edns};
      if ($udp_payload_size && $udp_payload_size > 512) {
+@@ -861,7 +864,8 @@ Emulates C<Net::DNS::Resolver::send()>.
+ This subroutine is a simple synchronous leftover from SpamAssassin version
+ 3.3 and does not participate in packet query caching and callback grouping
+ as implemented by AsyncLoop::bgsend_and_start_lookup().  As such it should
+-be avoided for mainstream usage.
++be avoided for mainstream usage.  Currently used through Mail::SPF::Server
++by the SPF plugin.
+ 
+ =cut
+ 
+commit 41f4c5ac8f275593a2bad1cb614b5185172ef568
+Author: Mark Martinec <mmartinec@apache.org>
+Date:   Tue Aug 4 23:10:16 2015 +0000
+
+    Bug 7231: Net::DNS 1.01 returns answers formatted differently, breaks SA
+    
+    git-svn-id: https://svn.apache.org/repos/asf/spamassassin/trunk@1694122 13f79535-47bb-0310-9956-ffa450edef68
+
+diff --git a/lib/Mail/SpamAssassin/Dns.pm b/lib/Mail/SpamAssassin/Dns.pm
+index 55e1640f8..1c305c939 100644
+--- a/lib/Mail/SpamAssassin/Dns.pm
++++ b/lib/Mail/SpamAssassin/Dns.pm
+@@ -171,7 +171,7 @@ sub dnsbl_hit {
+   if (substr($rule, 0, 2) eq "__") {
+     # don't bother with meta rules
+   } elsif ($answer->type eq 'TXT') {
+-    # txtdata returns a non- zone-file-format encoded result, unlike rdatastr;
++    # txtdata returns a non- zone-file-format encoded result, unlike rdstring;
+     # avoid space-separated RDATA <character-string> fields if possible,
+     # txtdata provides a list of strings in a list context since Net::DNS 0.69
+     $log = join('',$answer->txtdata);
+@@ -215,12 +215,14 @@ sub dnsbl_uri {
+ 
+   my $qname = $question->qname;
+ 
+-  # txtdata returns a non- zone-file-format encoded result, unlike rdatastr;
++  # txtdata returns a non- zone-file-format encoded result, unlike rdstring;
+   # avoid space-separated RDATA <character-string> fields if possible,
+   # txtdata provides a list of strings in a list context since Net::DNS 0.69
+   #
+-  my $rdatastr = $answer->UNIVERSAL::can('txtdata') ? join('',$answer->txtdata)
+-                                                    : $answer->rdatastr;
++  # rdatastr() is historical/undocumented, use rdstring() since Net::DNS 0.69
++  my $rdatastr = $answer->UNIVERSAL::can('txtdata')  ? join('',$answer->txtdata)
++               : $answer->UNIVERSAL::can('rdstring') ? $answer->rdstring
++                                                     : $answer->rdatastr;
+   if (defined $qname && defined $rdatastr) {
+     my $qclass = $question->qclass;
+     my $qtype = $question->qtype;
+@@ -267,8 +269,13 @@ sub process_dnsbl_result {
+     my $answ_type = $answer->type;
+     # TODO: there are some CNAME returns that might be useful
+     next if ($answ_type ne 'A' && $answ_type ne 'TXT');
+-    # skip any A record that isn't on 127/8
+-    next if ($answ_type eq 'A' && $answer->rdatastr !~ /^127\./);
++    if ($answ_type eq 'A') {
++      # Net::DNS::RR::A::address() is available since Net::DNS 0.69
++      my $ip_address = $answer->UNIVERSAL::can('address') ? $answer->address
++                                                          : $answer->rdatastr;
++      # skip any A record that isn't on 127.0.0.0/8
++      next if $ip_address !~ /^127\./;
++    }
+     for my $rule (@{$rules}) {
+       $self->dnsbl_hit($rule, $question, $answer);
+     }
+@@ -284,12 +291,14 @@ sub process_dnsbl_result {
+ sub process_dnsbl_set {
+   my ($self, $set, $question, $answer) = @_;
+ 
+-  # txtdata returns a non- zone-file-format encoded result, unlike rdatastr;
++  # txtdata returns a non- zone-file-format encoded result, unlike rdstring;
+   # avoid space-separated RDATA <character-string> fields if possible,
+   # txtdata provides a list of strings in a list context since Net::DNS 0.69
+   #
+-  my $rdatastr = $answer->UNIVERSAL::can('txtdata') ? join('',$answer->txtdata)
+-                                                    : $answer->rdatastr;
++  # rdatastr() is historical/undocumented, use rdstring() since Net::DNS 0.69
++  my $rdatastr = $answer->UNIVERSAL::can('txtdata')  ? join('',$answer->txtdata)
++               : $answer->UNIVERSAL::can('rdstring') ? $answer->rdstring
++                                                     : $answer->rdatastr;
+ 
+   while (my ($subtest, $rule) = each %{ $self->{dnspost}->{$set} }) {
+     next if $self->{tests_already_hit}->{$rule};
+diff --git a/lib/Mail/SpamAssassin/Plugin/AskDNS.pm b/lib/Mail/SpamAssassin/Plugin/AskDNS.pm
+index 3511162e8..4f41ff0ff 100644
+--- a/lib/Mail/SpamAssassin/Plugin/AskDNS.pm
++++ b/lib/Mail/SpamAssassin/Plugin/AskDNS.pm
+@@ -539,7 +539,7 @@ sub process_response_packet {
+     @answer = ( undef );
+   }
+ 
+-  # NOTE:  $rr->rdatastr returns the result encoded in a DNS zone file
++  # NOTE:  $rr->rdstring returns the result encoded in a DNS zone file
+   # format, i.e. enclosed in double quotes if a result contains whitespace
+   # (or other funny characters), and may use \DDD encoding or \X quoting as
+   # per RFC 1035.  Using $rr->txtdata instead avoids this unnecessary encoding
+@@ -566,19 +566,24 @@ sub process_response_packet {
+       # special case, no answer records, only rcode can be tested
+     } else {
+       $rr_type = uc $rr->type;
+-      if ($rr->UNIVERSAL::can('txtdata')) {  # TXT, SPF
+-        # join with no intervening spaces, as per RFC 5518
++      if ($rr_type eq 'A') {
++        # Net::DNS::RR::A::address() is available since Net::DNS 0.69
++        $rr_rdatastr = $rr->UNIVERSAL::can('address') ? $rr->address
++                                                      : $rr->rdatastr;
++        if ($rr_rdatastr =~ m/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\z/) {
++          $rdatanum = Mail::SpamAssassin::Util::my_inet_aton($rr_rdatastr);
++        }
++      } elsif ($rr->UNIVERSAL::can('txtdata')) {
++        # TXT, SPF: join with no intervening spaces, as per RFC 5518
+         if ($txtdata_can_provide_a_list || $rr_type ne 'TXT') {
+           $rr_rdatastr = join('', $rr->txtdata);  # txtdata() in list context!
+         } else {  # char_str_list() is only available for TXT records
+           $rr_rdatastr = join('', $rr->char_str_list);  # historical
+         }
+       } else {
+-        $rr_rdatastr = $rr->rdatastr;
+-        if ($rr_type eq 'A' &&
+-            $rr_rdatastr =~ m/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\z/) {
+-          $rdatanum = Mail::SpamAssassin::Util::my_inet_aton($rr_rdatastr);
+-        }
++        # rdatastr() is historical, use rdstring() since Net::DNS 0.69
++        $rr_rdatastr = $rr->UNIVERSAL::can('rdstring') ? $rr->rdstring
++                                                       : $rr->rdatastr;
+       }
+     # dbg("askdns: received rr type %s, data: %s", $rr_type, $rr_rdatastr);
+     }
+diff --git a/lib/Mail/SpamAssassin/Plugin/URIDNSBL.pm b/lib/Mail/SpamAssassin/Plugin/URIDNSBL.pm
+index 9602eba4e..674f42bd4 100644
+--- a/lib/Mail/SpamAssassin/Plugin/URIDNSBL.pm
++++ b/lib/Mail/SpamAssassin/Plugin/URIDNSBL.pm
+@@ -942,9 +942,8 @@ sub complete_ns_lookup {
+     next unless (defined($str) && defined($dom));
+     dbg("uridnsbl: got($j) NS for $dom: $str");
+ 
+-    if ($str =~ /IN\s+NS\s+(\S+)/) {
+-      my $nsmatch = lc $1;
+-      $nsmatch =~ s/\.$//;
++    if ($rr->type eq 'NS') {
++      my $nsmatch = lc $rr->nsdname;  # available since at least Net::DNS 0.14
+       my $nsrhblstr = $nsmatch;
+       my $fullnsrhblstr = $nsmatch;
+ 
+@@ -1025,9 +1024,11 @@ sub complete_a_lookup {
+     }
+     dbg("uridnsbl: complete_a_lookup got(%d) A for %s: %s", $j,$hname,$str);
+ 
+-    local $1;
+-    if ($str =~ /IN\s+A\s+(\S+)/) {
+-      $self->lookup_dnsbl_for_ip($pms, $ent->{obj}, $1);
++    if ($rr->type eq 'A') {
++      # Net::DNS::RR::A::address() is available since Net::DNS 0.69
++      my $ip_address = $rr->UNIVERSAL::can('address') ? $rr->address
++                                                      : $rr->rdatastr;
++      $self->lookup_dnsbl_for_ip($pms, $ent->{obj}, $ip_address);
+     }
+   }
+ }
+@@ -1038,7 +1039,8 @@ sub lookup_dnsbl_for_ip {
+   my ($self, $pms, $obj, $ip) = @_;
+ 
+   local($1,$2,$3,$4);
+-  $ip =~ /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/;
++  $ip =~ /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/
++    or warn "lookup_dnsbl_for_ip: not an IPv4 address: $ip\n";
+   my $revip = "$4.$3.$2.$1";
+ 
+   my $conf = $pms->{conf};
+@@ -1100,12 +1102,14 @@ sub complete_dnsbl_lookup {
+     my $rr_type = $rr->type;
+ 
+     if ($rr_type eq 'A') {
+-      $rdatastr = $rr->rdatastr;
++      # Net::DNS::RR::A::address() is available since Net::DNS 0.69
++      $rdatastr = $rr->UNIVERSAL::can('address') ? $rr->address
++                                                 : $rr->rdatastr;
+       if ($rdatastr =~ m/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) {
+         $rdatanum = Mail::SpamAssassin::Util::my_inet_aton($rdatastr);
+       }
+     } elsif ($rr_type eq 'TXT') {
+-      # txtdata returns a non- zone-file-format encoded result, unlike rdatastr;
++      # txtdata returns a non- zone-file-format encoded result, unlike rdstring;
+       # avoid space-separated RDATA <character-string> fields if possible;
+       # txtdata provides a list of strings in list context since Net::DNS 0.69
+       $rdatastr = join('',$rr->txtdata);
+commit 0d95b5b9280c3f8febffd418227a10f03747939a
+Author: Mark Martinec <mmartinec@apache.org>
+Date:   Mon Aug 10 23:43:53 2015 +0000
+
+    Bug 7236: Net::DNS assumes strings in TXT resource records are in UTF-8 and gratuitously tries to decodes it
+    
+    git-svn-id: https://svn.apache.org/repos/asf/spamassassin/trunk@1695182 13f79535-47bb-0310-9956-ffa450edef68
+
+diff --git a/lib/Mail/SpamAssassin/Plugin/ASN.pm b/lib/Mail/SpamAssassin/Plugin/ASN.pm
+index 3b406b00f..a5143fd12 100644
+--- a/lib/Mail/SpamAssassin/Plugin/ASN.pm
++++ b/lib/Mail/SpamAssassin/Plugin/ASN.pm
+@@ -355,8 +355,10 @@ sub process_dns_result {
+   foreach my $rr (@answer) {
+     dbg("asn: %s: lookup result packet: %s", $zone, $rr->string);
+     next if $rr->type ne 'TXT';
+-    my @strings = $rr->char_str_list;
++    my @strings = Net::DNS->VERSION >= 0.69 ? $rr->txtdata
++                                            : $rr->char_str_list;
+     next if !@strings;
++    for (@strings) { utf8::encode($_) if utf8::is_utf8($_) }
+ 
+     my @items;
+     if (@strings > 1 && join('',@strings) !~ m{\|}) {
+diff --git a/lib/Mail/SpamAssassin/Plugin/AskDNS.pm b/lib/Mail/SpamAssassin/Plugin/AskDNS.pm
+index 4cb37e1e1..b9b880ec3 100644
+--- a/lib/Mail/SpamAssassin/Plugin/AskDNS.pm
++++ b/lib/Mail/SpamAssassin/Plugin/AskDNS.pm
+@@ -574,6 +574,7 @@ sub process_response_packet {
+         if ($rr_rdatastr =~ m/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\z/) {
+           $rdatanum = Mail::SpamAssassin::Util::my_inet_aton($rr_rdatastr);
+         }
++
+       } elsif ($rr->UNIVERSAL::can('txtdata')) {
+         # TXT, SPF: join with no intervening spaces, as per RFC 5518
+         if ($txtdata_can_provide_a_list || $rr_type ne 'TXT') {
+@@ -581,10 +582,22 @@ sub process_response_packet {
+         } else {  # char_str_list() is only available for TXT records
+           $rr_rdatastr = join('', $rr->char_str_list);  # historical
+         }
++        # Net::DNS attempts to decode text strings in a TXT record as UTF-8,
++        # which is bad: octets failing the UTF-8 decoding are converted to
++        # three octets \x{EF}\x{BF}\x{BD} (i.e. to a Unicode "replacement
++        # character" U+FFFD encoded as UTF-8), and ASCII text is unnecessarily
++        # flagged as perl native characters (utf8 flag on), which can be
++        # disruptive on later processing, e.g. implicitly upgrading strings
++        # on concatenation. Unfortunately there is no way of legally bypassing
++        # the UTF-8 decoding by Net::DNS::RR::TXT in Net::DNS::RR::Text.
++        # Try to minimize damage by encoding back to UTF-8 octets:
++        utf8::encode($rr_rdatastr)  if utf8::is_utf8($rr_rdatastr);
++
+       } else {
+         # rdatastr() is historical, use rdstring() since Net::DNS 0.69
+         $rr_rdatastr = $rr->UNIVERSAL::can('rdstring') ? $rr->rdstring
+                                                        : $rr->rdatastr;
++        utf8::encode($rr_rdatastr)  if utf8::is_utf8($rr_rdatastr);
+       }
+     # dbg("askdns: received rr type %s, data: %s", $rr_type, $rr_rdatastr);
+     }
+diff --git a/lib/Mail/SpamAssassin/Plugin/URIDNSBL.pm b/lib/Mail/SpamAssassin/Plugin/URIDNSBL.pm
+index a35037dbe..978a2af7d 100644
+--- a/lib/Mail/SpamAssassin/Plugin/URIDNSBL.pm
++++ b/lib/Mail/SpamAssassin/Plugin/URIDNSBL.pm
+@@ -1108,6 +1108,7 @@ sub complete_dnsbl_lookup {
+       # avoid space-separated RDATA <character-string> fields if possible;
+       # txtdata provides a list of strings in list context since Net::DNS 0.69
+       $rdatastr = join('',$rr->txtdata);
++      utf8::encode($rdatastr)  if utf8::is_utf8($rdatastr);
+     } else {
+       next;
+     }
+commit 7e9872e5b45a7793b9aabeb513e45acde9dce652
+Author: Mark Martinec <mmartinec@apache.org>
+Date:   Tue Aug 11 16:22:27 2015 +0000
+
+    Bug 7236: Net::DNS assumes strings in TXT resource records are in UTF-8 and gratuitously tries to decodes it (also in Dns.pm)
+    
+    git-svn-id: https://svn.apache.org/repos/asf/spamassassin/trunk@1695336 13f79535-47bb-0310-9956-ffa450edef68
+
+diff --git a/lib/Mail/SpamAssassin/Dns.pm b/lib/Mail/SpamAssassin/Dns.pm
+index 0926a030e..014ab2bf6 100644
+--- a/lib/Mail/SpamAssassin/Dns.pm
++++ b/lib/Mail/SpamAssassin/Dns.pm
+@@ -177,6 +177,7 @@ sub dnsbl_hit {
+     # avoid space-separated RDATA <character-string> fields if possible,
+     # txtdata provides a list of strings in a list context since Net::DNS 0.69
+     $log = join('',$answer->txtdata);
++    utf8::encode($log)  if utf8::is_utf8($log);
+     local $1;
+     $log =~ s{ (?<! [<(\[] ) (https? : // \S+)}{<$1>}xgi;
+   } else {  # assuming $answer->type eq 'A'
+@@ -215,16 +216,27 @@ sub dnsbl_hit {
+ sub dnsbl_uri {
+   my ($self, $question, $answer) = @_;
+ 
+-  my $qname = $question->qname;
++  my $rdatastr;
++  if ($answer->UNIVERSAL::can('txtdata')) {
++    # txtdata returns a non- zone-file-format encoded result, unlike rdstring;
++    # avoid space-separated RDATA <character-string> fields if possible,
++    # txtdata provides a list of strings in a list context since Net::DNS 0.69
++    $rdatastr = join('',$answer->txtdata);
++  } else {
++    # rdatastr() is historical/undocumented, use rdstring() since Net::DNS 0.69
++    $rdatastr = $answer->UNIVERSAL::can('rdstring') ? $answer->rdstring
++                                                    : $answer->rdatastr;
++    # encoded in a RFC 1035 zone file format (escaped), decode it
++    $rdatastr =~ s{ \\ ( [0-9]{3} | (?![0-9]{3}) . ) }
++                  { length($1)==3 && $1 <= 255 ? chr($1) : $1 }xgse;
++  }
++  # Bug 7236: Net::DNS attempts to decode text strings in a TXT record as
++  # UTF-8 since version 0.69, which is undesired: octets failing the UTF-8
++  # decoding are converted to a Unicode "replacement character" U+FFFD, and
++  # ASCII text is unnecessarily flagged as perl native characters.
++  utf8::encode($rdatastr)  if utf8::is_utf8($rdatastr);
+ 
+-  # txtdata returns a non- zone-file-format encoded result, unlike rdstring;
+-  # avoid space-separated RDATA <character-string> fields if possible,
+-  # txtdata provides a list of strings in a list context since Net::DNS 0.69
+-  #
+-  # rdatastr() is historical/undocumented, use rdstring() since Net::DNS 0.69
+-  my $rdatastr = $answer->UNIVERSAL::can('txtdata')  ? join('',$answer->txtdata)
+-               : $answer->UNIVERSAL::can('rdstring') ? $answer->rdstring
+-                                                     : $answer->rdatastr;
++  my $qname = $question->qname;
+   if (defined $qname && defined $rdatastr) {
+     my $qclass = $question->qclass;
+     my $qtype = $question->qtype;
+@@ -293,14 +305,25 @@ sub process_dnsbl_result {
+ sub process_dnsbl_set {
+   my ($self, $set, $question, $answer) = @_;
+ 
+-  # txtdata returns a non- zone-file-format encoded result, unlike rdstring;
+-  # avoid space-separated RDATA <character-string> fields if possible,
+-  # txtdata provides a list of strings in a list context since Net::DNS 0.69
+-  #
+-  # rdatastr() is historical/undocumented, use rdstring() since Net::DNS 0.69
+-  my $rdatastr = $answer->UNIVERSAL::can('txtdata')  ? join('',$answer->txtdata)
+-               : $answer->UNIVERSAL::can('rdstring') ? $answer->rdstring
+-                                                     : $answer->rdatastr;
++  my $rdatastr;
++  if ($answer->UNIVERSAL::can('txtdata')) {
++    # txtdata returns a non- zone-file-format encoded result, unlike rdstring;
++    # avoid space-separated RDATA <character-string> fields if possible,
++    # txtdata provides a list of strings in a list context since Net::DNS 0.69
++    $rdatastr = join('',$answer->txtdata);
++  } else {
++    # rdatastr() is historical/undocumented, use rdstring() since Net::DNS 0.69
++    $rdatastr = $answer->UNIVERSAL::can('rdstring') ? $answer->rdstring
++                                                    : $answer->rdatastr;
++    # encoded in a RFC 1035 zone file format (escaped), decode it
++    $rdatastr =~ s{ \\ ( [0-9]{3} | (?![0-9]{3}) . ) }
++                  { length($1)==3 && $1 <= 255 ? chr($1) : $1 }xgse;
++  }
++  # Bug 7236: Net::DNS attempts to decode text strings in a TXT record as
++  # UTF-8 since version 0.69, which is undesired: octets failing the UTF-8
++  # decoding are converted to a Unicode "replacement character" U+FFFD, and
++  # ASCII text is unnecessarily flagged as perl native characters.
++  utf8::encode($rdatastr)  if utf8::is_utf8($rdatastr);
+ 
+   while (my ($subtest, $rule) = each %{ $self->{dnspost}->{$set} }) {
+     next if $self->{tests_already_hit}->{$rule};
+diff --git a/lib/Mail/SpamAssassin/Plugin/AskDNS.pm b/lib/Mail/SpamAssassin/Plugin/AskDNS.pm
+index d26117bbb..ac533a779 100644
+--- a/lib/Mail/SpamAssassin/Plugin/AskDNS.pm
++++ b/lib/Mail/SpamAssassin/Plugin/AskDNS.pm
+@@ -584,9 +584,9 @@ sub process_response_packet {
+           $rr_rdatastr = join('', $rr->char_str_list);  # historical
+         }
+         # Net::DNS attempts to decode text strings in a TXT record as UTF-8,
+-        # which is bad: octets failing the UTF-8 decoding are converted to
+-        # three octets \x{EF}\x{BF}\x{BD} (i.e. to a Unicode "replacement
+-        # character" U+FFFD encoded as UTF-8), and ASCII text is unnecessarily
++        # which is undesired: octets failing the UTF-8 decoding are converted
++        # to a Unicode "replacement character" U+FFFD (encoded as octets
++        # \x{EF}\x{BF}\x{BD} in UTF-8), and ASCII text is unnecessarily
+         # flagged as perl native characters (utf8 flag on), which can be
+         # disruptive on later processing, e.g. implicitly upgrading strings
+         # on concatenation. Unfortunately there is no way of legally bypassing
