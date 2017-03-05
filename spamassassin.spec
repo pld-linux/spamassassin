@@ -266,6 +266,9 @@ aplikacji do czytania poczty.
 # disable broken test
 %{__mv} t/sa_compile.t{,.disabled}
 
+# this test needs network, does not work on builders
+%{__mv} t/dnsbl_subtests.t{,.disabled}
+
 %build
 # for spamc/configure
 export CFLAGS="%{rpmcflags}"
