@@ -1,0 +1,5 @@
+[Unit]
+Description=Spamassassin Rules Updates
+
+[Service]
+ExecStart=/usr/share/spamassassin/sa-update.cron

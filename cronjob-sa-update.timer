@@ -1,0 +1,8 @@
+[Unit]
+Description=Spamassassin Rules Updates timer
+
+[Timer]
+OnCalendar=4:10
+
+[Install]
+WantedBy=cronjobs.target

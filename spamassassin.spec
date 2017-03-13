@@ -13,7 +13,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
 Version:	3.4.1
-Release:	5
+Release:	6
 License:	Apache v2.0
 Group:		Applications/Mail
 Source0:	http://ftp.ps.pl/pub/apache//spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -26,6 +26,8 @@ Source5:	sa-update.sh
 Source6:	sa-update.cron
 Source7:	spamassassin-official.conf
 Source8:	sought.conf
+Source9:	cronjob-sa-update.service
+Source10:	cronjob-sa-update.timer
 Patch0:		spamassassin-3.4.1-netdns.patch
 URL:		http://spamassassin.apache.org/
 BuildRequires:	openssl-devel >= 0.9.7d
@@ -194,7 +196,7 @@ ta wtyczka jest wczytana.
 Summary:	sa-update - automate SpamAssassin rule updates
 Summary(pl.UTF-8):	sa-update - automatyczne uaktualnianie regułek SpamAssassina
 Group:		Applications/Mail
-Requires:	crondaemon
+Requires:	cronjobs
 Requires:	gnupg
 Requires:	perl-Archive-Tar
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
@@ -292,7 +294,7 @@ export CFLAGS="%{rpmcflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/{cron.d,sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spamassassin/channel.d}
+install -d $RPM_BUILD_ROOT{/etc/{cron.d,sysconfig,rc.d/init.d},%{_sysconfdir}/mail/spamassassin/channel.d,%{systemdunitdir}}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -305,6 +307,8 @@ install %{SOURCE5} $RPM_BUILD_ROOT%{_datadir}/spamassassin/sa-update.cron
 install %{SOURCE6} $RPM_BUILD_ROOT/etc/cron.d/sa-update
 install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/channel.d
 install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/channel.d
+install %{SOURCE9} $RPM_BUILD_ROOT%{systemdunitdir}/cronjob-sa-update.service
+install %{SOURCE10} $RPM_BUILD_ROOT%{systemdunitdir}/cronjob-sa-update.timer
 
 # sa-update, sa-compile
 install -d $RPM_BUILD_ROOT/var/lib/spamassassin/{%{sa_version},compiled/%{sa_version}}
@@ -391,6 +395,8 @@ fi
 %{_datadir}/spamassassin/sa-update-pubkey.txt
 %dir /var/lib/spamassassin/%{sa_version}
 %{_mandir}/man1/sa-update.1*
+%{systemdunitdir}/cronjob-sa-update.service
+%{systemdunitdir}/cronjob-sa-update.timer
 
 %files -n perl-Mail-SpamAssassin
 %defattr(644,root,root,755)
