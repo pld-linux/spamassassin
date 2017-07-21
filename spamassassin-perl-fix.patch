@@ -1,0 +1,12 @@
+diff -ruNp Mail-SpamAssassin-3.4.1.orig/spamc/configure.pl Mail-SpamAssassin-3.4.1/spamc/configure.pl
+--- Mail-SpamAssassin-3.4.1.orig/spamc/configure.pl	2015-04-28 21:56:59.000000000 +0200
++++ Mail-SpamAssassin-3.4.1/spamc/configure.pl	2017-07-21 23:34:50.122992872 +0200
+@@ -66,7 +66,7 @@ print join(' ', $Config{'perlpath'}, "ve
+   # Do the same thing as for the preprocessor below.
+   package version_h;
+   my $Z = $0;
+-  local $0    = "version.h.pl";
++  local $0    = "./version.h.pl";
+   local @ARGV = ();
+   # Got to check for defined because the script returns shell error level!
+   unless (defined do $0) {

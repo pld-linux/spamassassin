@@ -1,0 +1,12 @@
+diff -ruNp Mail-SpamAssassin-3.4.1.orig/lib/Mail/SpamAssassin/PerMsgStatus.pm Mail-SpamAssassin-3.4.1/lib/Mail/SpamAssassin/PerMsgStatus.pm
+--- Mail-SpamAssassin-3.4.1.orig/lib/Mail/SpamAssassin/PerMsgStatus.pm	2015-04-28 21:56:49.000000000 +0200
++++ Mail-SpamAssassin-3.4.1/lib/Mail/SpamAssassin/PerMsgStatus.pm	2017-07-21 23:30:28.831982090 +0200
+@@ -918,7 +918,7 @@ sub get_content_preview {
+ 
+   # in case the last line was huge, trim it back to around 200 chars
+   local $1;
+-  $str =~ s/^(.{,200}).*$/$1/gs;
++  $str =~ s/^(.{1,200}).*$/$1/gs;
+ 
+   # now, some tidy-ups that make things look a bit prettier
+   $str =~ s/-----Original Message-----.*$//gs;
