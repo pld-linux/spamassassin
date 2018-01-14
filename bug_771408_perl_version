@@ -1,0 +1,15 @@
+upstream fix for bug #771408
+Index: spamassassin-3.4.1/lib/Mail/SpamAssassin/Conf/Parser.pm
+===================================================================
+--- spamassassin-3.4.1.orig/lib/Mail/SpamAssassin/Conf/Parser.pm
++++ spamassassin-3.4.1/lib/Mail/SpamAssassin/Conf/Parser.pm
+@@ -536,6 +536,9 @@ sub handle_conditional {
+     elsif ($token eq 'perl_version') {
+       $eval .= $]." ";
+     }
++    elsif ($token eq 'perl_version') {
++      $eval .= $]." ";
++    }
+     elsif ($token =~ /^\w[\w\:]+$/) { # class name
+       my $u = untaint_var($token);
+       $eval .= '"' . $u . '" ';

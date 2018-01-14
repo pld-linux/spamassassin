@@ -13,7 +13,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
 Version:	3.4.1
-Release:	7
+Release:	8
 License:	Apache v2.0
 Group:		Applications/Mail
 Source0:	http://ftp.ps.pl/pub/apache//spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -29,8 +29,13 @@ Source8:	sought.conf
 Source9:	cronjob-sa-update.service
 Source10:	cronjob-sa-update.timer
 Patch0:		spamassassin-3.4.1-netdns.patch
-Patch1:		%{name}-perl-regexp.patch
-Patch2:		%{name}-perl-fix.patch
+Patch1:		%{name}-perl-fix.patch
+Patch2:		bug_771408_perl_version
+Patch3:		bug_828552-openssl-1.1.0
+Patch4:		bug-869408-unescaped-brace-in-regex.patch
+Patch5:		disable_sslv3
+Patch6:		dkim_subdomains
+Patch7:		fix-uninitialized-concat
 URL:		http://spamassassin.apache.org/
 BuildRequires:	openssl-devel >= 0.9.7d
 BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
@@ -268,6 +273,11 @@ aplikacji do czytania poczty.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
 
 # disable broken test
 %{__mv} t/sa_compile.t{,.disabled}
