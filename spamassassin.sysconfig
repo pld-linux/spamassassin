@@ -1,4 +1,4 @@
 # Customized settings for spamassassin (spamd)
 
 # Cmdline options 
-SPAMD_OPTS="-d -c --pidfile=/var/run/spamassassin.pid"
+SPAMD_OPTS="-d -c"
