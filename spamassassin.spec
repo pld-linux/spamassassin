@@ -8,7 +8,6 @@
 %define		pdir	Mail
 %define		pnam	SpamAssassin
 %define		sa_version %(printf %d.%03d%03d $(echo %{version} | tr '.' ' '))
-%include	/usr/lib/rpm/macros.perl
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
