@@ -11,12 +11,12 @@
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
-Version:	3.4.6
-Release:	2
+Version:	4.0.0
+Release:	0.1
 License:	Apache v2.0
 Group:		Applications/Mail
-Source0:	http://ftp.ps.pl/pub/apache//spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
-# Source0-md5:	0ef3f64ffcdf6f1e96068e19a16ce1be
+Source0:	https://dlcdn.apache.org//spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
+# Source0-md5:	acc8562fd4f549614a95760c858c8b79
 Source1:	%{name}.sysconfig
 Source2:	%{name}-spamd.init
 Source3:	%{name}-default.rc
@@ -27,7 +27,6 @@ Source7:	spamassassin-official.conf
 Source8:	sought.conf
 Source9:	cronjob-sa-update.service
 Source10:	cronjob-sa-update.timer
-Patch0:		bug_771408_perl_version
 URL:		http://spamassassin.apache.org/
 BuildRequires:	openssl-devel >= 0.9.7d
 BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
@@ -35,6 +34,7 @@ BuildRequires:	perl-Archive-Tar
 BuildRequires:	perl-DBI
 BuildRequires:	perl-DB_File
 BuildRequires:	perl-Digest-SHA1 >= 2.10
+BuildRequires:	perl-Geo-IP
 BuildRequires:	perl-HTML-Parser >= 3
 BuildRequires:	perl-IO-Socket-INET6 >= 2.51
 BuildRequires:	perl-IO-Socket-SSL
@@ -43,8 +43,13 @@ BuildRequires:	perl-IP-Country
 BuildRequires:	perl-Mail-SPF-Query
 BuildRequires:	perl-Net-DNS >= 0.65-3
 BuildRequires:	perl-Net-Ident
+BuildRequires:	perl-Net-LibIDN
+BuildRequires:	perl-Net-LibIDN2
+BuildRequires:	perl-Net-Patricia
 BuildRequires:	perl-NetAddr-IP >= 4.000
+BuildRequires:	perl-Perl-Critic-Policy-Perlsecret
 #BuildRequires:	perl-Razor2
+BuildRequires:	perl-Text-Diff
 BuildRequires:	perl-devel >= 1:5.8.0
 BuildRequires:	perl-libwww
 BuildRequires:	re2c
@@ -61,6 +66,7 @@ BuildRequires:	perl-Mail-DomainKeys
 BuildRequires:	perl-Mail-SPF
 BuildRequires:	perl-MailTools
 BuildRequires:	perl-Razor > 2.61
+BuildRequires:  tesseract-data-lang-en
 %endif
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Obsoletes:	SpamAssassin
@@ -113,9 +119,9 @@ Requires(post,preun):	/sbin/chkconfig
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Requires:	rc-scripts
 Suggests:	perl-Apache-Test
+Suggests:	perl-IO-Socket-INET6
 Suggests:	perl-IO-Socket-IP
 Suggests:	perl-IO-Socket-SSL
-Suggests:	perl-IO-Socket-INET6
 Suggests:	perl-Net-Ident
 
 %description spamd
@@ -175,8 +181,8 @@ Group:		Applications/Mail
 Requires:	gcc
 Requires:	glibc-devel
 Requires:	make
-Requires:	perl(ExtUtils::MakeMaker)
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
+Requires:	perl-devel
 Requires:	perl-devel
 Requires:	re2c >= 0.10
 
@@ -225,7 +231,7 @@ Summary(pl.UTF-8):	Mail::SpamAssassin - biblioteki filtra poczty SpamAssassin
 Group:		Development/Languages/Perl
 Requires:	perl-HTML-Parser >= 3
 # what for this one?
-#Requires:	perl-Sys-Hostname-Long
+#Requires: perl-Sys-Hostname-Long
 Suggests:	Razor
 Suggests:	perl-Cache-DB_File >= 0.2
 Suggests:	perl-DBD-mysql
@@ -234,8 +240,8 @@ Suggests:	perl-Geo-IP
 Suggests:	perl-IO-Socket-INET6 >= 2.51
 Suggests:	perl-IP-Country
 Suggests:	perl-Mail-DKIM
-#Suggests:	perl-Mail-DomainKeys
-#Suggests:	perl-Mail-SPF
+#Suggests: perl-Mail-DomainKeys
+#Suggests: perl-Mail-SPF
 Suggests:	perl-Mail-SPF-Query
 Suggests:	perl-Net-DNS >= 0.34
 Suggests:	perl-Net-Patricia
@@ -262,17 +268,6 @@ aplikacji do czytania poczty.
 
 %prep
 %setup -q -n %{pdir}-%{pnam}-%{version}
-%patch0 -p1
-
-# disable broken test
-%{__mv} t/sa_compile.t{,.disabled}
-
-# this test needs network, does not work on builders
-%{__mv} t/dnsbl_subtests.t{,.disabled}
-
-# temporary disable problematic tests
-%{__mv} t/trust_path.t{,.disabled}
-%{__mv} t/urilocalbl_geoip.t{,.disabled}
 
 %build
 # for spamc/configure
@@ -280,10 +275,7 @@ export CFLAGS="%{rpmcflags}"
 %{__perl} Makefile.PL \
 	INSTALLDIRS=vendor \
 	PREFIX=%{_prefix} \
-	SYSCONFDIR=%{_sysconfdir} \
-	DATADIR=%{_datadir}/spamassassin \
 	ENABLE_SSL=yes \
-	CONTACT_ADDRESS="postmaster@localhost" \
 	PERL_BIN=%{__perl} < /dev/null
 
 %{__make} \
@@ -299,16 +291,16 @@ install -d $RPM_BUILD_ROOT{/etc/{cron.d,sysconfig,rc.d/init.d},%{_sysconfdir}/ma
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-install %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamd
-install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamd
-install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
-install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
-install %{SOURCE5} $RPM_BUILD_ROOT%{_datadir}/spamassassin/sa-update.cron
-install %{SOURCE6} $RPM_BUILD_ROOT/etc/cron.d/sa-update
-install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/channel.d
-install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/channel.d
-install %{SOURCE9} $RPM_BUILD_ROOT%{systemdunitdir}/cronjob-sa-update.service
-install %{SOURCE10} $RPM_BUILD_ROOT%{systemdunitdir}/cronjob-sa-update.timer
+cp -p %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamd
+cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamd
+cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
+cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
+cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_datadir}/spamassassin/sa-update.cron
+cp -p %{SOURCE6} $RPM_BUILD_ROOT/etc/cron.d/sa-update
+cp -p %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/channel.d
+cp -p %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/channel.d
+cp -p %{SOURCE9} $RPM_BUILD_ROOT%{systemdunitdir}/cronjob-sa-update.service
+cp -p %{SOURCE10} $RPM_BUILD_ROOT%{systemdunitdir}/cronjob-sa-update.timer
 
 # sa-update, sa-compile
 install -d $RPM_BUILD_ROOT/var/lib/spamassassin/{%{sa_version},compiled/%{sa_version}}
