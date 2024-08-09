@@ -11,12 +11,12 @@
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
-Version:	4.0.0
+Version:	4.0.1
 Release:	0.1
 License:	Apache v2.0
 Group:		Applications/Mail
 Source0:	https://dlcdn.apache.org//spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
-# Source0-md5:	acc8562fd4f549614a95760c858c8b79
+# Source0-md5:	b42eaf00f2f5a013813ae051ab2c63b6
 Source1:	%{name}.sysconfig
 Source2:	%{name}-spamd.init
 Source3:	%{name}-default.rc
