@@ -24,7 +24,7 @@ Source4:	%{name}-spamc.rc
 Source5:	sa-update.sh
 Source6:	sa-update.cron
 Source7:	spamassassin-official.conf
-Source8:	sought.conf
+
 Source9:	cronjob-sa-update.service
 Source10:	cronjob-sa-update.timer
 URL:		http://spamassassin.apache.org/
@@ -298,7 +298,7 @@ cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
 cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_datadir}/spamassassin/sa-update.cron
 cp -p %{SOURCE6} $RPM_BUILD_ROOT/etc/cron.d/sa-update
 cp -p %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/channel.d
-cp -p %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/channel.d
+
 cp -p %{SOURCE9} $RPM_BUILD_ROOT%{systemdunitdir}/cronjob-sa-update.service
 cp -p %{SOURCE10} $RPM_BUILD_ROOT%{systemdunitdir}/cronjob-sa-update.timer
 
@@ -379,7 +379,6 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mail/spamassassin/channels
 %dir %{_sysconfdir}/mail/spamassassin/channel.d
 %{_sysconfdir}/mail/spamassassin/channel.d/spamassassin-official.conf
-%{_sysconfdir}/mail/spamassassin/channel.d/sought.conf
 %attr(700,root,root) %dir %{_sysconfdir}/mail/spamassassin/sa-update-keys
 %attr(700,root,root) %ghost %{_sysconfdir}/mail/spamassassin/sa-update-keys/*
 %config(noreplace) %verify(not md5 mtime size) /etc/cron.d/sa-update
