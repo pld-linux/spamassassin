@@ -12,7 +12,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
 Version:	3.4.6
-Release:	2
+Release:	3
 License:	Apache v2.0
 Group:		Applications/Mail
 Source0:	http://ftp.ps.pl/pub/apache//spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
@@ -24,7 +24,7 @@ Source4:	%{name}-spamc.rc
 Source5:	sa-update.sh
 Source6:	sa-update.cron
 Source7:	spamassassin-official.conf
-Source8:	sought.conf
+
 Source9:	cronjob-sa-update.service
 Source10:	cronjob-sa-update.timer
 Patch0:		bug_771408_perl_version
@@ -306,7 +306,7 @@ install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin
 install %{SOURCE5} $RPM_BUILD_ROOT%{_datadir}/spamassassin/sa-update.cron
 install %{SOURCE6} $RPM_BUILD_ROOT/etc/cron.d/sa-update
 install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/channel.d
-install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/channel.d
+
 install %{SOURCE9} $RPM_BUILD_ROOT%{systemdunitdir}/cronjob-sa-update.service
 install %{SOURCE10} $RPM_BUILD_ROOT%{systemdunitdir}/cronjob-sa-update.timer
 
@@ -387,7 +387,6 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mail/spamassassin/channels
 %dir %{_sysconfdir}/mail/spamassassin/channel.d
 %{_sysconfdir}/mail/spamassassin/channel.d/spamassassin-official.conf
-%{_sysconfdir}/mail/spamassassin/channel.d/sought.conf
 %attr(700,root,root) %dir %{_sysconfdir}/mail/spamassassin/sa-update-keys
 %attr(700,root,root) %ghost %{_sysconfdir}/mail/spamassassin/sa-update-keys/*
 %config(noreplace) %verify(not md5 mtime size) /etc/cron.d/sa-update
