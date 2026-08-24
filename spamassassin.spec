@@ -5,18 +5,18 @@
 # Conditional build:
 %bcond_without	tests		# do not perform "make test"
 
-%define		pdir	Mail
-%define		pnam	SpamAssassin
+%define		subver	svn1935691
+%define		snapver	4.0.2+%{subver}
 %define		sa_version %(printf %d.%03d%03d $(echo %{version} | tr '.' ' '))
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
-Version:	4.0.2
-Release:	0.1
+Version:	4.0.3
+Release:	0.%{subver}.1
 License:	Apache v2.0
 Group:		Applications/Mail
-Source0:	https://dlcdn.apache.org//spamassassin/source/%{pdir}-%{pnam}-%{version}.tar.bz2
-# Source0-md5:	78d04879aab9978c30f4086dd986075b
+Source0:	https://deb.debian.org/debian/pool/main/s/spamassassin/spamassassin_%{snapver}.orig.tar.xz
+# Source0-md5:	3758ce46810fb68483d4bfd1cee25087
 Source1:	%{name}.sysconfig
 Source2:	%{name}-spamd.init
 Source3:	%{name}-default.rc
@@ -27,50 +27,43 @@ Source7:	spamassassin-official.conf
 
 Source9:	cronjob-sa-update.service
 Source10:	cronjob-sa-update.timer
+Patch0:		%{name}-neuralnetwork-test-optional-fann.patch
 URL:		http://spamassassin.apache.org/
 BuildRequires:	openssl-devel >= 0.9.7d
 BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
 BuildRequires:	perl-Archive-Tar
 BuildRequires:	perl-DBI
 BuildRequires:	perl-DB_File
-BuildRequires:	perl-Digest-SHA1 >= 2.10
 BuildRequires:	perl-Geo-IP
-BuildRequires:	perl-HTML-Parser >= 3
+BuildRequires:	perl-HTML-Parser >= 3.43
 BuildRequires:	perl-IO-Socket-INET6 >= 2.51
 BuildRequires:	perl-IO-Socket-SSL
 BuildRequires:	perl-IO-Zlib
 BuildRequires:	perl-IP-Country
-BuildRequires:	perl-Mail-SPF-Query
-BuildRequires:	perl-Net-DNS >= 0.65-3
-BuildRequires:	perl-Net-Ident
+BuildRequires:	perl-Net-DNS >= 1.10
 BuildRequires:	perl-Net-LibIDN
 BuildRequires:	perl-Net-LibIDN2
 BuildRequires:	perl-Net-Patricia
-BuildRequires:	perl-NetAddr-IP >= 4.000
-BuildRequires:	perl-Perl-Critic-Policy-Perlsecret
-#BuildRequires:	perl-Razor2
-BuildRequires:	perl-Text-Diff
+BuildRequires:	perl-NetAddr-IP >= 4.010
 BuildRequires:	perl-devel >= 1:5.8.0
 BuildRequires:	perl-libwww
 BuildRequires:	re2c
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.453
 %if %{with tests}
-# are these really needed?
 #BuildRequires:	perl-Compress-Zlib
 BuildRequires:	perl-Encode-Detect
 BuildRequires:	perl-MIME-Base64
-BuildRequires:	perl-MIME-tools
 BuildRequires:	perl-Mail-DKIM
-BuildRequires:	perl-Mail-DomainKeys
 BuildRequires:	perl-Mail-SPF
-BuildRequires:	perl-MailTools
+BuildRequires:	perl-Perl-Critic-Policy-Perlsecret
 BuildRequires:	perl-Razor > 2.61
+BuildRequires:	perl-Text-Diff
 BuildRequires:  tesseract-data-lang-en
 %endif
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
-Obsoletes:	SpamAssassin
-Obsoletes:	spamassassin-tools
+Obsoletes:	SpamAssassin < 2.31
+Obsoletes:	spamassassin-tools < 3.2.1
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(DBI)' 'perl(Net::Ident)'
@@ -122,7 +115,6 @@ Suggests:	perl-Apache-Test
 Suggests:	perl-IO-Socket-INET6
 Suggests:	perl-IO-Socket-IP
 Suggests:	perl-IO-Socket-SSL
-Suggests:	perl-Net-Ident
 
 %description spamd
 The purpose of this program is to provide a daemonized version of the
@@ -183,7 +175,6 @@ Requires:	glibc-devel
 Requires:	make
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Requires:	perl-devel
-Requires:	perl-devel
 Requires:	re2c >= 0.10
 
 %description compile
@@ -203,7 +194,6 @@ Summary(pl.UTF-8):	sa-update - automatyczne uaktualnianie regułek SpamAssassina
 Group:		Applications/Mail
 Requires:	cronjobs
 Requires:	gnupg
-Requires:	perl-Archive-Tar
 Requires:	perl-Mail-SpamAssassin = %{version}-%{release}
 Requires:	perl-libwww
 
@@ -229,9 +219,6 @@ podpisów GPG.
 Summary:	Mail::SpamAssassin - SpamAssassin e-mail filter libraries
 Summary(pl.UTF-8):	Mail::SpamAssassin - biblioteki filtra poczty SpamAssassin
 Group:		Development/Languages/Perl
-Requires:	perl-HTML-Parser >= 3
-# what for this one?
-#Requires: perl-Sys-Hostname-Long
 Suggests:	Razor
 Suggests:	perl-Cache-DB_File >= 0.2
 Suggests:	perl-DBD-mysql
@@ -240,10 +227,8 @@ Suggests:	perl-Geo-IP
 Suggests:	perl-IO-Socket-INET6 >= 2.51
 Suggests:	perl-IP-Country
 Suggests:	perl-Mail-DKIM
-#Suggests: perl-Mail-DomainKeys
-#Suggests: perl-Mail-SPF
-Suggests:	perl-Mail-SPF-Query
-Suggests:	perl-Net-DNS >= 0.34
+Suggests:	perl-Mail-SPF
+Suggests:	perl-Net-DNS >= 1.10
 Suggests:	perl-Net-Patricia
 Suggests:	spamassassin-compile
 Suggests:	spamassassin-plugin-fuzzyocr
@@ -267,7 +252,8 @@ oznaczona jako spam w celu późniejszego wyfiltrowania, np. przy użyciu
 aplikacji do czytania poczty.
 
 %prep
-%setup -q -n %{pdir}-%{pnam}-%{version}
+%setup -q -n %{name}-%{snapver}
+%patch -P0 -p1
 
 %build
 # for spamc/configure
@@ -282,7 +268,7 @@ export CFLAGS="%{rpmcflags}"
 	CC="%{__cc}" \
 	OPTIMIZE="%{rpmcflags}"
 
-%{?with_tests:%{__make} -j1 TEST_VERBOSE=1 test}
+%{?with_tests:%{__make} -j1 test}
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -290,6 +276,13 @@ install -d $RPM_BUILD_ROOT{/etc/{cron.d,sysconfig,rc.d/init.d},%{_sysconfdir}/ma
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
+
+# upstream's make install ships no rules at all; install the ruleset regenerated
+# from rulesrc/ during %build, minus the unvetted sandbox rules the sa-update
+# channel also withholds. sa-update output in /var/lib/spamassassin/%{sa_version}
+# takes precedence over these (Mail::SpamAssassin @default_rules_path).
+cp -p rules/*.cf $RPM_BUILD_ROOT%{_datadir}/spamassassin
+%{__rm} $RPM_BUILD_ROOT%{_datadir}/spamassassin/{70_sandbox,local,regression_tests}.cf
 
 cp -p %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/spamd
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/spamd
@@ -303,7 +296,7 @@ cp -p %{SOURCE9} $RPM_BUILD_ROOT%{systemdunitdir}/cronjob-sa-update.service
 cp -p %{SOURCE10} $RPM_BUILD_ROOT%{systemdunitdir}/cronjob-sa-update.timer
 
 # sa-update, sa-compile
-install -d $RPM_BUILD_ROOT/var/lib/spamassassin/{%{sa_version},compiled/%{sa_version}}
+install -d $RPM_BUILD_ROOT/var/lib/spamassassin/{%{sa_version},compiled}
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/sa-update-keys
 touch $RPM_BUILD_ROOT%{_sysconfdir}/mail/spamassassin/sa-update-keys/{pubring,secring,trustdb}.gpg
 
@@ -325,6 +318,15 @@ if [ "$1" = "0" ]; then
 	%service spamd stop
 	/sbin/chkconfig --del spamd
 fi
+
+%post update
+%systemd_post cronjob-sa-update.timer
+
+%preun update
+%systemd_preun cronjob-sa-update.timer
+
+%postun update
+%systemd_reload
 
 %triggerpostun spamd -- spamassassin-spamd < 3.1.0-5.3
 # temp hack, should we care of the dead link?
@@ -371,8 +373,9 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/sa-compile
 %{_mandir}/man1/sa-compile.1*
+# sa-compile picks compiled/<perl major ver>/<sa version> from $] at runtime,
+# so the leaf dirs cannot be owned here - it creates them itself
 %dir /var/lib/spamassassin/compiled
-%dir /var/lib/spamassassin/compiled/%{sa_version}
 
 %files update
 %defattr(644,root,root,755)
@@ -398,6 +401,7 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mail/spamassassin/*.cf
 %exclude %{_sysconfdir}/mail/spamassassin/sa-update-keys
 %dir %{_datadir}/spamassassin
+%{_datadir}/spamassassin/*.cf
 %config(noreplace) %{_datadir}/spamassassin/languages
 %config(noreplace) %{_datadir}/spamassassin/user_prefs.template
 %exclude %{_datadir}/spamassassin/sa-update-pubkey.txt

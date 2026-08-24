@@ -1,0 +1,19 @@
+The NeuralNetwork plugin is optional - AI::FANN is listed as an optional module
+by Makefile.PL and the loadplugin line in rules/v403.pre is commented out - but
+its test declares a fixed plan and only guards DBD::SQLite, so without AI::FANN
+14 of 18 subtests fail instead of the test being skipped. Guard it the way every
+other optional-module test under t/ does.
+
+--- spamassassin-4.0.2+svn1935691/t/neuralnetwork.t.orig
++++ spamassassin-4.0.2+svn1935691/t/neuralnetwork.t
+@@ -8,8 +8,10 @@
+ use Storable qw(retrieve);
+ use Test::More;
+ 
++use constant HAS_FANN => eval { require AI::FANN; 1 };
+ use constant HAS_SQLITE => eval { require DBD::SQLite; 1 };
+ 
++plan skip_all => "Needs AI::FANN" unless HAS_FANN;
+ plan tests => 18;
+ 
+ sub nn_reinit {
