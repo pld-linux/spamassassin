@@ -12,7 +12,7 @@ Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
 Version:	4.0.3
-Release:	0.%{subver}.1
+Release:	0.%{subver}.2
 License:	Apache v2.0
 Group:		Applications/Mail
 Source0:	https://deb.debian.org/debian/pool/main/s/spamassassin/spamassassin_%{snapver}.orig.tar.xz
@@ -66,7 +66,7 @@ Obsoletes:	SpamAssassin < 2.31
 Obsoletes:	spamassassin-tools < 3.2.1
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(DBI)' 'perl(Net::Ident)'
+%define		_noautoreq	'perl(Razor2::Client::Agent)' 'perl(Razor::Agent)' 'perl(Razor::Client)' 'perl(DBI)' 'perl(Net::Ident)' 'perl(AI::FANN)'
 
 %description
 Apache SpamAssassin provides you with a way to reduce if not
