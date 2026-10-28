@@ -5,18 +5,18 @@
 # Conditional build:
 %bcond_without	tests		# do not perform "make test"
 
-%define		subver	svn1935691
+%define		subver	svn1939112
 %define		snapver	4.0.2+%{subver}
 %define		sa_version %(printf %d.%03d%03d $(echo %{version} | tr '.' ' '))
 Summary:	A spam filter for email which can be invoked from mail delivery agents
 Summary(pl.UTF-8):	Filtr antyspamowy, przeznaczony dla programów dostarczających pocztę (MDA)
 Name:		spamassassin
 Version:	4.0.3
-Release:	0.%{subver}.2
+Release:	0.%{subver}.1
 License:	Apache v2.0
 Group:		Applications/Mail
 Source0:	https://deb.debian.org/debian/pool/main/s/spamassassin/spamassassin_%{snapver}.orig.tar.xz
-# Source0-md5:	3758ce46810fb68483d4bfd1cee25087
+# Source0-md5:	62d19476800f10ae6301ccd046612c22
 Source1:	%{name}.sysconfig
 Source2:	%{name}-spamd.init
 Source3:	%{name}-default.rc
@@ -27,7 +27,6 @@ Source7:	spamassassin-official.conf
 
 Source9:	cronjob-sa-update.service
 Source10:	cronjob-sa-update.timer
-Patch0:		%{name}-neuralnetwork-test-optional-fann.patch
 URL:		http://spamassassin.apache.org/
 BuildRequires:	openssl-devel >= 0.9.7d
 BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.16
@@ -253,7 +252,6 @@ aplikacji do czytania poczty.
 
 %prep
 %setup -q -n %{name}-%{snapver}
-%patch -P0 -p1
 
 %build
 # for spamc/configure
